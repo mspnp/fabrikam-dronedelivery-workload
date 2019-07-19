@@ -23,5 +23,5 @@ d. ```EXTERNAL_INGEST_FQDN``` value from [deployment instructions](../../microse
    > if the ```EXTERNAL_INGEST_FQDN``` was not configured properly it is noticed from Test Results ```Graph``` because Total Requests metric is 0.
    Please check from ```Details``` looking for errors and ensure the check FQDN is well formed.
 
-> Note: this load test executes two separate scenarios, the first one will use a single user to send at about 200 request/sec.
-While the second scenario is designed to load 40 users to deliver up to 2600 request/sec. Depending on how much ingestion and backend services instances are configured, the load they will ingest/egress respectively.
+> Note: this load test executes two separate scenarios against the GET invoicing endpoint, the first one will use a single user to send up to 20 request/sec.
+While the second scenario is designed to load 40 users to deliver up to 75 request/sec.
