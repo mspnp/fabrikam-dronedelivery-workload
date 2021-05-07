@@ -13,3 +13,11 @@ The Drone Delivery application is a sample application that consists of several 
 - Package service. Manages packages (./src/shipping/package)
 - Drone scheduler service. Schedules drones and monitors drones in flight (./src/shipping/dronescheduler)
 - Delivery service. Manages deliveries that are scheduled or in-transit (./src/shipping/delivery).
+
+## Contributions
+
+Please see our [contributor guide](./CONTRIBUTING.md).
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact <opencode@microsoft.com> with any additional questions or comments.
+
+With :heart: from Microsoft Patterns & Practices, [Azure Architecture Center](https://aka.ms/architecture).
