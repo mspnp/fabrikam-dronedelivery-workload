@@ -27,7 +27,7 @@
             }
         },
         "geoRedundancyLocation": {
-            "defaultValue": "westus",
+            "defaultValue": "centralus",
             "type": "string",
             "allowedValues": [
                 "australiasoutheast",
@@ -53,29 +53,17 @@
                 "southeastasia"
             ],
             "metadata": {
-                "description": "For Azure resources that support native geo-redunancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/en-us/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
+                "description": "For Azure resources that support native geo-redundancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/en-us/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
             }
-        },
-        "environmentName": {
-            "type": "string",
-            "defaultValue": "dev",
-            "allowedValues": [
-                "dev"
-            ]
         }
     },
     "variables": {
         "acrName": "[uniqueString('acr-', subscription().subscriptionId, resourceGroup().id)]",
-        "nestedACRDeploymentName": "[concat('azuredeploy-acr-',resourceGroup().name,parameters('environmentName'))]",
-        "environmentSettings": {
-            "dev": {
-                "acrName": "[variables('acrName')]"
-            }
-        }
+        "acrDeploymentName": "[concat('azuredeploy-acr-',resourceGroup().name)]"
     },
     "resources": [
      {
-            "name": "[variables('nestedACRDeploymentName')]",
+            "name": "[variables('acrDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-05-01",
             "dependsOn": [
@@ -88,9 +76,9 @@
                     "contentVersion": "1.0.0.0",
                     "resources": [
                         {
-                            "name": "[variables('environmentSettings')[parameters('environmentName')].acrName]",
+                            "name": "[variables('acrName')]",
                             "type": "Microsoft.ContainerRegistry/registries",
-                            "apiVersion": "2019-05-01",
+                            "apiVersion": "2020-11-01-preview",
                             "sku": {
                                 "name": "Premium",
                                 "tier": "Premium"
@@ -129,7 +117,7 @@
                                     "name": "[parameters('geoRedundancyLocation')]",
                                     "location": "[parameters('geoRedundancyLocation')]",
                                     "dependsOn": [
-                                        "[variables('environmentSettings')[parameters('environmentName')].acrName]"
+                                        "[variables('acrName')]"
                                     ],
                                     "properties": {
                                     }
@@ -139,7 +127,7 @@
                     ],
                     "outputs": {
                         "acrId": {
-                            "value": "[resourceId('Microsoft.ContainerRegistry/registries', variables('environmentSettings')[parameters('environmentName')].acrName)]",
+                            "value": "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
                             "type": "string"
                         }
                     }
@@ -149,7 +137,7 @@
     ],
     "outputs": {
         "acrName": {
-            "value": "[variables('environmentSettings')[parameters('environmentName')].acrName]",
+            "value": "[variables('acrName')]",
             "type": "string"
         }
     }

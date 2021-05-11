@@ -1,6 +1,10 @@
-# Azure Kubernetes Service (AKS) Fabrikam Drone Delivery - Shared services
+# Fabrikam Drone Delivery - Shared services
 
-This repository contains source files and build instructions for microservices that can be consumed by any reference implementation.
+This repository contains source files and build instructions for the containerized Fabrikam Drone Delivery application. Once all the microservices are built and pushed to your Azure Container Registry, they're ready to be pulled by any Azure service that has support for containers.
+
+It is currently used in:
+* [Microservices architecture on AKS](https://github.com/mspnp/microservices-reference-implementation)
+* [Fabrikam drone delivery](https://github.com/mspnp/aks-fabrikam-dronedelivery) reference implementation.
 
 ## The Drone Delivery app
 
@@ -18,65 +22,63 @@ The Drone Delivery application is a sample application that consists of several 
 
 ### Log in to Azure CLI
 
-   ```bash
-    az login
-   ```
+```bash
+az login
+```
 
 ### Create the ACR resource group
 
-   ```bash
-    ACR_RESOURCE_GROUP=rg-dronedelivery-acr
-    az group create -l centralus -n $ACR_RESOURCE_GROUP
-   ```
+```bash
+ACR_RESOURCE_GROUP=rg-dronedelivery-acr
+az group create -l eastus -n $ACR_RESOURCE_GROUP
+```
 
 ### Deploy the ACR
 
-   ```bash
-    az deployment group create --template-file acr.json --resource-group $ACR_RESOURCE_GROUP
-   ```
+```bash
+az deployment group create -f acr.json -g $ACR_RESOURCE_GROUP
+```
 
 ### Assign ACR variables
 
-   ```bash
-    export ACR_NAME=$(az deployment group show --resource-group  $ACR_RESOURCE_GROUP -n acr --query properties.outputs.acrName.value -o tsv)
-    export ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
-   ```
+```bash
+ACR_NAME=$(az deployment group show -g  $ACR_RESOURCE_GROUP -n acr --query properties.outputs.acrName.value -o tsv)
+ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
+```
 
-
-## Build the service images
+## Build the microservice images
 
 ### Steps
 
 1. Build the Delivery service.
 
-   ```bash
-   az acr build -r $ACR_NAME -t $ACR_SERVER/delivery:0.1.0 ./src/shipping/delivery/.
-   ```
+```bash
+az acr build -r $ACR_NAME -t $ACR_SERVER/delivery:0.1.0 ./src/shipping/delivery/.
+```
 
 2. Build the Ingestion service.
 
-   ```bash
-   az acr build -r $ACR_NAME -t $ACR_SERVER/ingestion:0.1.0 ./src/shipping/ingestion/.
-   ```
+```bash
+az acr build -r $ACR_NAME -t $ACR_SERVER/ingestion:0.1.0 ./src/shipping/ingestion/.
+```
 
 3. Build the Workflow service.
 
-   ```bash
-   az acr build -r $ACR_NAME -t $ACR_SERVER/workflow:0.1.0 ./src/shipping/workflow/.
-   ```
+```bash
+az acr build -r $ACR_NAME -t $ACR_SERVER/workflow:0.1.0 ./src/shipping/workflow/.
+```
 
 4. Build the DroneScheduler service.
 
-   ```bash
-   az acr build -r $ACR_NAME -f ./src/shipping/dronescheduler/Dockerfile -t $ACR_SERVER/dronescheduler:0.1.0 ./src/shipping/.
-   ```
+```bash
+az acr build -r $ACR_NAME -f ./src/shipping/dronescheduler/Dockerfile -t $ACR_SERVER/dronescheduler:0.1.0 ./src/shipping/.
+```
 
-5. Build the Package service
+5. Build the Package service.
 
-   ```bash
-   az acr build -r $ACR_NAME -t $ACR_SERVER/package:0.1.0 ./src/shipping/package/.
-   ```
-
+```bash
+az acr build -r $ACR_NAME -t $ACR_SERVER/package:0.1.0 ./src/shipping/package/.
+```
 
 ## Contributions
 
