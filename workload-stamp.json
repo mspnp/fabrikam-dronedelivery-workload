@@ -21,9 +21,12 @@
         "ingestionSBName": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionServiceAccessKeyName": "IngestionServiceAccessKey",
         "droneSchedulerKeyVaultName": "[concat('ds-',uniqueString(resourceGroup().id))]",
+        "logAnalyticsWorkspaceName": "[concat('la-', variables('acrName'))]",
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
-        "workflowServiceAccessKeyName": "WorkflowServiceAccessKey"
+        "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
+        "aiNamePrefix": "ai",
+        "appInsightsName": "[concat(uniqueString(variables('aiNamePrefix'),resourceGroup().id))]"
 
     },
     "parameters": {
@@ -80,45 +83,18 @@
             "metadata": {
                 "description": "For Azure resources that support native geo-redundancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://docs.microsoft.com/en-us/azure/best-practices-availability-paired-regions. This region does not need to support availability zones."
             }
+        },
+        "droneSchedulerPrincipalId": {
+            "type": "string"
+        },
+        "workflowPrincipalId": {
+            "type": "string"
+        },
+        "deliveryPrincipalId": {
+            "type": "string"
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-            "name": "[variables('workflowIdName')]",
-            "apiVersion": "2015-08-31-preview",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "workflow managed identity",
-                "what": "rbac",
-                "reason": "aad-pod-identity",
-                "app": "fabrikam-workflow"
-            }
-        },
-        {
-            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-            "name": "[variables('deliveryIdName')]",
-            "apiVersion": "2015-08-31-preview",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "delivery managed identity",
-                "what": "rbac",
-                "reason": "aad-pod-identity",
-                "app": "fabrikam-delivery"
-            }
-        },
-        {
-            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-            "name": "[variables('droneSchedulerIdName')]",
-            "apiVersion": "2015-08-31-preview",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "dronescheduler managed identity",
-                "what": "rbac",
-                "reason": "aad-pod-identity",
-                "app": "fabrikam-dronescheduler"
-            }
-        },
         {
             "name": "[variables('acrName')]",
             "type": "Microsoft.ContainerRegistry/registries",
@@ -169,6 +145,65 @@
             ]
         },
         {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2020-08-01",
+            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+            },
+            "resources": [
+                {
+                    "apiVersion": "2020-08-01",
+                    "name": "AllPrometheus",
+                    "type": "savedSearches",
+                    "dependsOn": [
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                    ],
+                    "properties": {
+                        "eTag": "*",
+                        "category": "Prometheus",
+                        "displayName": "All collected Prometheus information",
+                        "query": "InsightsMetrics | where Namespace == \"prometheus\"",
+                        "version": 1
+                    }
+                },
+                {
+                    "apiVersion": "2020-08-01",
+                    "name": "ForbiddenReponsesOnIngress",
+                    "type": "savedSearches",
+                    "dependsOn": [
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                    ],
+                    "properties": {
+                        "eTag": "*",
+                        "category": "Prometheus",
+                        "displayName": "Increase number of forbidden response on the Ingress Controller",
+                        "query": "let value = toscalar(InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize Value = avg(Val) by bin(TimeGenerated, 5m) | summarize min = min(Value)); InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize AggregatedValue = avg(Val)-value by bin(TimeGenerated, 5m) | order by TimeGenerated | render barchart",
+                        "version": 1
+                    }
+                },
+                {
+                    "apiVersion": "2015-03-20",
+                    "name": "NodeRebootRequested",
+                    "type": "savedSearches",
+                    "dependsOn": [
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
+                    ],
+                    "properties": {
+                        "eTag": "*",
+                        "category": "Prometheus",
+                        "displayName": "Nodes reboot required by kured",
+                        "query": "InsightsMetrics | where Namespace == \"prometheus\" and Name == \"kured_reboot_required\" | where Val > 0",
+                        "version": 1
+                    }
+                }
+            ]
+        },
+        {
             "name": "[variables('deliveryRedisName')]",
             "type": "Microsoft.Cache/Redis",
             "apiVersion": "2020-06-01",
@@ -188,6 +223,30 @@
                 }
             },
             "resources": [
+                {
+                    "apiVersion": "2017-05-01-preview",
+                    "type": "Microsoft.Cache/redis/providers/diagnosticsettings",
+                    "name": "[concat(variables('deliveryRedisName'), '/Microsoft.Insights/', variables('deliveryRedisName'))]",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Cache/Redis', variables('deliveryRedisName'))]",
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+                    ],
+                    "properties": {
+                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                        "logs": [],
+                        "metrics": [
+                            {
+                                "timeGrain": "AllMetrics",
+                                "enabled": "[variables('deliveryRedisDiagnosticsEnabled')]",
+                                "retentionPolicy": {
+                                    "days": 90,
+                                    "enabled": "[variables('deliveryRedisDiagnosticsEnabled')]"
+                                }
+                            }
+                        ]
+                    }
+                }
             ]
         },
         {
@@ -317,13 +376,24 @@
             ]
         },
         {
+            "name": "[variables('appInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02-preview",
+            "kind": "other",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "App Insights instance - Distributed Tracing"
+            },
+            "properties": {
+                "Application_Type": "other"
+            }
+        },
+        {
             "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('deliveryKeyVaultName')]",
             "apiVersion": "2019-09-01",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deliveryIdName'))]"
-            ],
+            "dependsOn": [],
             "tags": {
                 "displayName": "Delivery Key Vault",
                 "app": "fabrikam-delivery"
@@ -343,7 +413,7 @@
                 "accessPolicies": [
                     {
                         "tenantId": "[subscription().tenantId]",
-                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deliveryIdName'))).principalId]",
+                        "objectId": "[parameters('deliveryPrincipalId')]",
                         "permissions": {
                             "secrets": [
                                 "get",
@@ -401,6 +471,18 @@
                         "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]",
                         "[resourceId('Microsoft.Cache/Redis', variables('deliveryRedisName'))]"
                     ]
+                },
+                {
+                    "type": "secrets",
+                    "name": "ApplicationInsights--InstrumentationKey",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2015-05-01').InstrumentationKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]",
+                        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+                    ]
                 }
             ]
         },
@@ -409,9 +491,7 @@
             "name": "[variables('droneSchedulerKeyVaultName')]",
             "apiVersion": "2019-09-01",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('droneSchedulerIdName'))]"
-            ],
+            "dependsOn": [],
             "tags": {
                 "displayName": "DroneScheduler Key Vault",
                 "app": "fabrikam-dronescheduler"
@@ -431,7 +511,7 @@
                 "accessPolicies": [
                     {
                         "tenantId": "[subscription().tenantId]",
-                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('droneSchedulerIdName'))).principalId]",
+                        "objectId": "[parameters('droneSchedulerPrincipalId')]",
                         "permissions": {
                             "secrets": [
                                 "get",
@@ -442,6 +522,18 @@
                 ]
             },
             "resources": [
+                {
+                    "type": "secrets",
+                    "name": "ApplicationInsights--InstrumentationKey",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2015-05-01').InstrumentationKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]",
+                        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+                    ]
+                },
                 {
                     "type": "secrets",
                     "name": "CosmosDBEndpoint",
@@ -539,9 +631,7 @@
             "name": "[variables('workflowKeyVaultName')]",
             "apiVersion": "2019-09-01",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('workflowIdName'))]"
-            ],
+            "dependsOn": [],
             "tags": {
                 "displayName": "Workflow Key Vault",
                 "app": "fabrikam-workflow"
@@ -561,7 +651,7 @@
                 "accessPolicies": [
                     {
                         "tenantId": "[subscription().tenantId]",
-                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('workflowIdName'))).principalId]",
+                        "objectId": "[parameters('workflowPrincipalId')]",
                         "permissions": {
                             "secrets": [
                                 "get",
@@ -617,6 +707,18 @@
                         "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]",
                         "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('ingestionSBNamespace'), variables('workflowServiceAccessKeyName'))]"
                     ]
+                },
+                {
+                    "type": "secrets",
+                    "name": "ApplicationInsights--InstrumentationKey",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2015-05-01').InstrumentationKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]",
+                        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+                    ]
                 }
             ]
         },
@@ -625,8 +727,7 @@
             "apiVersion": "2021-04-01-preview",
             "name": "[concat(variables('deliveryKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('deliveryIdName'), resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deliveryIdName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]"
             ],
             "comments": "Grant the Fabrikam delivery app manage identity with Reader role permissions over KeyVault",
             "tags": {
@@ -636,7 +737,7 @@
             },
             "properties": {
                 "roleDefinitionId": "[variables('readerRole')]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('deliveryIdName'))).principalId]",
+                "principalId": "[parameters('deliveryPrincipalId')]",
                 "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]",
                 "principalType": "ServicePrincipal"
             }
@@ -646,8 +747,7 @@
             "apiVersion": "2021-04-01-preview",
             "name": "[concat(variables('workflowKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('workflowIdName'), resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('workflowIdName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]"
             ],
             "comments": "Grant the Fabrikam workflow app manage identity with reader role permissions over KeyVault",
             "tags": {
@@ -657,7 +757,7 @@
             },
             "properties": {
                 "roleDefinitionId": "[variables('readerRole')]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('workflowIdName'))).principalId]",
+                "principalId": "[parameters('workflowPrincipalId')]",
                 "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]",
                 "principalType": "ServicePrincipal"
             }
@@ -667,8 +767,7 @@
             "apiVersion": "2021-04-01-preview",
             "name": "[concat(variables('droneSchedulerKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('droneSchedulerIdName'), resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('droneSchedulerIdName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]"
             ],
             "comments": "Grant the Fabrikam drone scheduler app Manage Identity with reader role permissions over KeyVault",
             "tags": {
@@ -678,7 +777,7 @@
             },
             "properties": {
                 "roleDefinitionId": "[variables('readerRole')]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('droneSchedulerIdName'))).principalId]",
+                "principalId": "[parameters('droneSchedulerPrincipalId')]",
                 "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]",
                 "principalType": "ServicePrincipal"
             }
