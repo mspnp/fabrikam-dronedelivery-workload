@@ -33,10 +33,10 @@ ACR_RESOURCE_GROUP=rg-dronedelivery-acr
 az group create -l eastus -n $ACR_RESOURCE_GROUP
 ```
 
-### Deploy the ACR
+### Deploy the workload
 
 ```bash
-az deployment group create -f acr.json -g $ACR_RESOURCE_GROUP
+az deployment group create -f workload-stamp.json -g $ACR_RESOURCE_GROUP
 ```
 
 ### Assign ACR variables
