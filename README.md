@@ -42,7 +42,7 @@ az deployment group create -f workload-stamp.json -g $ACR_RESOURCE_GROUP
 ### Assign ACR variables
 
 ```bash
-ACR_NAME=$(az deployment group show -g  $ACR_RESOURCE_GROUP -n acr --query properties.outputs.acrName.value -o tsv)
+ACR_NAME=$(az deployment group show -g  $ACR_RESOURCE_GROUP -n workload-stamp --query properties.outputs.acrName.value -o tsv)
 ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
 ```
 

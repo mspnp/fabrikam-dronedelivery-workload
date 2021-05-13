@@ -688,6 +688,10 @@
         "acrId": {
             "value": "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
             "type": "string"
+        },
+        "acrName": {
+            "value": "[variables('acrName')]",
+            "type": "string"
         }
     }
 }
