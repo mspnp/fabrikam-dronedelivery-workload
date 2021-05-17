@@ -21,12 +21,12 @@
         "ingestionSBName": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionServiceAccessKeyName": "IngestionServiceAccessKey",
         "droneSchedulerKeyVaultName": "[concat('ds-',uniqueString(resourceGroup().id))]",
-        "logAnalyticsWorkspaceName": "[concat('la-', variables('acrName'))]",
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
         "aiNamePrefix": "ai",
-        "appInsightsName": "[concat(uniqueString(variables('aiNamePrefix'),resourceGroup().id))]"
+        "appInsightsName": "[concat(uniqueString(variables('aiNamePrefix'),resourceGroup().id))]",
+        "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
 
     },
     "parameters": {
@@ -92,116 +92,86 @@
         },
         "deliveryPrincipalId": {
             "type": "string"
+        },
+        "acrResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "the resource group name of the Azure Continer Registry"
+            }
         }
     },
     "resources": [
         {
-            "name": "[variables('acrName')]",
-            "type": "Microsoft.ContainerRegistry/registries",
-            "apiVersion": "2020-11-01-preview",
-            "sku": {
-                "name": "Premium",
-                "tier": "Premium"
-            },
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "Container Registry"
-            },
+            "name": "[variables('nestedACRDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "dependsOn": [
+            ],
+            "resourceGroup": "[parameters('acrResourceGroupName')]",
             "properties": {
-                "adminUserEnabled": false,
-                "networkRuleSet": {
-                    "defaultAction": "Allow",
-                    "virtualNetworkRules": [
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[variables('acrName')]",
+                            "type": "Microsoft.ContainerRegistry/registries",
+                            "apiVersion": "2020-11-01-preview",
+                            "sku": {
+                                "name": "Premium",
+                                "tier": "Premium"
+                            },
+                            "location": "[resourceGroup().location]",
+                            "tags": {
+                                "displayName": "Container Registry"
+                            },
+                            "properties": {
+                                "adminUserEnabled": false,
+                                "networkRuleSet": {
+                                    "defaultAction": "Allow",
+                                    "virtualNetworkRules": [
+                                    ],
+                                    "ipRules": [
+                                    ]
+                                },
+                                "policies": {
+                                    "quarantinePolicy": {
+                                        "status": "disabled"
+                                    },
+                                    "trustPolicy": {
+                                        "type": "Notary",
+                                        "status": "disabled"
+                                    },
+                                    "retentionPolicy": {
+                                        "days": 15,
+                                        "status": "enabled"
+                                    }
+                                }
+                            },
+                            "resources": [
+                                {
+                                    "type": "replications",
+                                    "apiVersion": "2019-05-01",
+                                    "name": "[parameters('geoRedundancyLocation')]",
+                                    "location": "[parameters('geoRedundancyLocation')]",
+                                    "dependsOn": [
+                                        "[variables('acrName')]"
+                                    ],
+                                    "properties": {
+                                    }
+                                }
+                            ]
+                        }
                     ],
-                    "ipRules": [
-                    ]
-                },
-                "policies": {
-                    "quarantinePolicy": {
-                        "status": "disabled"
-                    },
-                    "trustPolicy": {
-                        "type": "Notary",
-                        "status": "disabled"
-                    },
-                    "retentionPolicy": {
-                        "days": 15,
-                        "status": "enabled"
+                    "outputs": {
+                        "acrId": {
+                            "value": "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
+                            "type": "string"
+                        }
                     }
                 }
-            },
-            "resources": [
-                {
-                    "type": "replications",
-                    "apiVersion": "2019-05-01",
-                    "name": "[parameters('geoRedundancyLocation')]",
-                    "location": "[parameters('geoRedundancyLocation')]",
-                    "dependsOn": [
-                        "[variables('acrName')]"
-                    ],
-                    "properties": {
-                    }
-                }
-            ]
-        },
-        {
-            "type": "Microsoft.OperationalInsights/workspaces",
-            "apiVersion": "2020-08-01",
-            "name": "[variables('logAnalyticsWorkspaceName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "sku": {
-                    "name": "PerGB2018"
-                },
-                "retentionInDays": 30
-            },
-            "resources": [
-                {
-                    "apiVersion": "2020-08-01",
-                    "name": "AllPrometheus",
-                    "type": "savedSearches",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "All collected Prometheus information",
-                        "query": "InsightsMetrics | where Namespace == \"prometheus\"",
-                        "version": 1
-                    }
-                },
-                {
-                    "apiVersion": "2020-08-01",
-                    "name": "ForbiddenReponsesOnIngress",
-                    "type": "savedSearches",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "Increase number of forbidden response on the Ingress Controller",
-                        "query": "let value = toscalar(InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize Value = avg(Val) by bin(TimeGenerated, 5m) | summarize min = min(Value)); InsightsMetrics | where Namespace == \"prometheus\" and Name == \"traefik_entrypoint_requests_total\" | where parse_json(Tags).code == 403 | summarize AggregatedValue = avg(Val)-value by bin(TimeGenerated, 5m) | order by TimeGenerated | render barchart",
-                        "version": 1
-                    }
-                },
-                {
-                    "apiVersion": "2015-03-20",
-                    "name": "NodeRebootRequested",
-                    "type": "savedSearches",
-                    "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "eTag": "*",
-                        "category": "Prometheus",
-                        "displayName": "Nodes reboot required by kured",
-                        "query": "InsightsMetrics | where Namespace == \"prometheus\" and Name == \"kured_reboot_required\" | where Val > 0",
-                        "version": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "name": "[variables('deliveryRedisName')]",
@@ -210,7 +180,8 @@
             "location": "[resourceGroup().location]",
             "tags": {
                 "displayName": "Redis Cache for inflight deliveries",
-                "app": "fabrikam-delivery"
+                "app": "fabrikam-delivery",
+                "TODO": "add log analytics resource"
             },
             "dependsOn": [
             ],
@@ -223,30 +194,6 @@
                 }
             },
             "resources": [
-                {
-                    "apiVersion": "2017-05-01-preview",
-                    "type": "Microsoft.Cache/redis/providers/diagnosticsettings",
-                    "name": "[concat(variables('deliveryRedisName'), '/Microsoft.Insights/', variables('deliveryRedisName'))]",
-                    "location": "[resourceGroup().location]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Cache/Redis', variables('deliveryRedisName'))]",
-                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
-                    ],
-                    "properties": {
-                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
-                        "logs": [],
-                        "metrics": [
-                            {
-                                "timeGrain": "AllMetrics",
-                                "enabled": "[variables('deliveryRedisDiagnosticsEnabled')]",
-                                "retentionPolicy": {
-                                    "days": 90,
-                                    "enabled": "[variables('deliveryRedisDiagnosticsEnabled')]"
-                                }
-                            }
-                        ]
-                    }
-                }
             ]
         },
         {
@@ -374,19 +321,6 @@
                     ]
                 }
             ]
-        },
-        {
-            "name": "[variables('appInsightsName')]",
-            "type": "Microsoft.Insights/components",
-            "apiVersion": "2020-02-02-preview",
-            "kind": "other",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "App Insights instance - Distributed Tracing"
-            },
-            "properties": {
-                "Application_Type": "other"
-            }
         },
         {
             "type": "Microsoft.KeyVault/vaults",
@@ -721,6 +655,19 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "[variables('appInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02-preview",
+            "kind": "other",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "App Insights instance - Distributed Tracing"
+            },
+            "properties": {
+                "Application_Type": "other"
+            }
         },
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
