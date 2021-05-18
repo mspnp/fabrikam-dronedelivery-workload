@@ -738,6 +738,42 @@
         "acrName": {
             "value": "[variables('acrName')]",
             "type": "string"
+        },
+        "deliveryKeyVaultUri": {
+            "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))).vaultUri]",
+            "type": "string"
+        },
+        "droneSchedulerKeyVaultUri": {
+            "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))).vaultUri]",
+            "type": "string"
+        },
+        "deliveryCosmosDbName": {
+            "value": "[variables('deliveryCosmosDbName')]",
+            "type": "string"
+        },
+        "droneSchedulerCosmosDbName": {
+            "value": "[variables('droneSchedulerCosmosDbName')]",
+            "type": "string"
+        },
+        "packageMongoDbName": {
+            "value": "[variables('packageMongoDbName')]",
+            "type": "string"
+        },
+        "ingestionQueueNamespace": {
+            "value": "[variables('ingestionSBNamespace')]",
+            "type": "string"
+        },
+        "ingestionQueueName": {
+            "value": "[variables('ingestionSBName')]",
+            "type": "string"
+        },
+        "ingestionServiceAccessKeyName": {
+            "value": "[variables('ingestionServiceAccessKeyName')]",
+            "type": "string"
+        },
+        "workflowKeyVaultName": {
+            "value": "[variables('workflowKeyVaultName')]",
+            "type": "string"
         }
     }
 }
