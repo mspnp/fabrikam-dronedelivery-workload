@@ -774,6 +774,10 @@
         "workflowKeyVaultName": {
             "value": "[variables('workflowKeyVaultName')]",
             "type": "string"
+        },
+        "appInsightsName": {
+            "value": "[variables('appInsightsName')]",
+            "type": "string"
         }
     }
 }
