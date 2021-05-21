@@ -39,9 +39,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-05-01",
             "name": "workload-stamp-prereqs-dep",
-            "resourceGroup": "[variables('acrResourceGroupName')]",
+            "resourceGroup": "[parameters('resourceGroupName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups/', variables('acrResourceGroupName'))]"
+                "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGroupName'))]"
             ],
             "properties": {
                 "mode": "Incremental",
