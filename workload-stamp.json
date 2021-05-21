@@ -24,8 +24,7 @@
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
-        "aiNamePrefix": "ai",
-        "appInsightsName": "[uniqueString(variables('aiNamePrefix'),resourceGroup().id)]",
+        "appInsightsName": "[concat('ai-', uniqueString(resourceGroup().id)]",
         "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
 
     },
