@@ -25,7 +25,7 @@
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
         "aiNamePrefix": "ai",
-        "appInsightsName": "[concat(uniqueString(variables('aiNamePrefix'),resourceGroup().id))]",
+        "appInsightsName": "[uniqueString(variables('aiNamePrefix'),resourceGroup().id)]",
         "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
 
     },
