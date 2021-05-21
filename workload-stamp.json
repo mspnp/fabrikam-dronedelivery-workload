@@ -24,7 +24,7 @@
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
-        "appInsightsName": "[concat('ai-', uniqueString(resourceGroup().id)]",
+        "appInsightsName": "[concat('ai-', uniqueString(resourceGroup().id))]",
         "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
 
     },
@@ -95,7 +95,7 @@
         "acrResourceGroupName": {
             "type": "string",
             "metadata": {
-                "description": "the resource group name of the Azure Continer Registry"
+                "description": "the resource group name of the Azure Container Registry"
             }
         }
     },
