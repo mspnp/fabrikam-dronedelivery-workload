@@ -15,11 +15,15 @@
         "deliveryIdName": "dev-d",
         "workflowIdName": "dev-wf",
         "droneSchedulerIdName": "dev-ds",
+        "ingestionIdName": "dev-in",
+        "packageIdName": "dev-pk",
+        "packageKeyVaultName": "[concat('pkkv-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespace": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespaceSKU": "Premium",
         "ingestionSBNamespaceTier": "Premium",
         "ingestionSBName": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionServiceAccessKeyName": "IngestionServiceAccessKey",
+        "ingestionKeyVaultName": "[concat('ingkv-',uniqueString(resourceGroup().id))]",
         "droneSchedulerKeyVaultName": "[concat('ds-',uniqueString(resourceGroup().id))]",
         "readerRole": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "workflowKeyVaultName": "[concat('wf-',uniqueString(resourceGroup().id))]",
@@ -90,6 +94,12 @@
             "type": "string"
         },
         "deliveryPrincipalId": {
+            "type": "string"
+        },
+        "ingestionPrincipalId": {
+            "type": "string"
+        },
+        "packagePrincipalId": {
             "type": "string"
         },
         "acrResourceGroupName": {
@@ -421,6 +431,106 @@
         },
         {
             "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('packageKeyVaultName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "Package Key Vault",
+                "app": "fabrikam-package"
+            },
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "[subscription().tenantId]",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Allow",
+                    "virtualNetworkRules": [
+                    ]
+                },
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[parameters('packagePrincipalId')]",
+                        "permissions": {
+                            "secrets": [
+                                "get",
+                                "list"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "ApplicationInsights--InstrumentationKey",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2015-05-01').InstrumentationKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('packageKeyVaultName'))]",
+                        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('ingestionKeyVaultName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "Ingestion Key Vault",
+                "app": "fabrikam-ingestion"
+            },
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "[subscription().tenantId]",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Allow",
+                    "virtualNetworkRules": [
+                    ]
+                },
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[parameters('ingestionPrincipalId')]",
+                        "permissions": {
+                            "secrets": [
+                                "get",
+                                "list"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "ApplicationInsights--InstrumentationKey",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2015-05-01').InstrumentationKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]",
+                        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('droneSchedulerKeyVaultName')]",
             "apiVersion": "2019-09-01",
             "location": "[resourceGroup().location]",
@@ -727,6 +837,46 @@
                 "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]",
                 "principalType": "ServicePrincipal"
             }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[concat(variables('ingestionKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('ingestionIdName'), resourceGroup().id), variables('readerRole')))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]"
+            ],
+            "comments": "Grant the Fabrikam ingestion app Manage Identity with reader role permissions over KeyVault",
+            "tags": {
+                "displayName": "Fabrikam ingestion app RBAC access for KeyVault",
+                "what": "ingestion-identity-rbac-reader-to-keyvault",
+                "app": "fabrikam-ingestion"
+            },
+            "properties": {
+                "roleDefinitionId": "[variables('readerRole')]",
+                "principalId": "[parameters('ingestionPrincipalId')]",
+                "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[concat(variables('packageKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('packageIdName'), resourceGroup().id), variables('readerRole')))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('packageKeyVaultName'))]"
+            ],
+            "comments": "Grant the Fabrikam package app Manage Identity with reader role permissions over KeyVault",
+            "tags": {
+                "displayName": "Fabrikam package app RBAC access for KeyVault",
+                "what": "package-identity-rbac-reader-to-keyvault",
+                "app": "fabrikam-package"
+            },
+            "properties": {
+                "roleDefinitionId": "[variables('readerRole')]",
+                "principalId": "[parameters('packagePrincipalId')]",
+                "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('packageKeyVaultName'))]",
+                "principalType": "ServicePrincipal"
+            }
         }
     ],
     "outputs": {
@@ -772,6 +922,22 @@
         },
         "workflowKeyVaultName": {
             "value": "[variables('workflowKeyVaultName')]",
+            "type": "string"
+        },
+        "deliveryKeyVaultName": {
+            "value": "[variables('deliveryKeyVaultName')]",
+            "type": "string"
+        },
+        "droneSchedulerKeyVaultName": {
+            "value": "[variables('droneSchedulerKeyVaultName')]",
+            "type": "string"
+        },
+        "ingestionKeyVaultName": {
+            "value": "[variables('ingestionKeyVaultName')]",
+            "type": "string"
+        },
+        "packageKeyVaultName": {
+            "value": "[variables('packageKeyVaultName')]",
             "type": "string"
         },
         "appInsightsName": {
