@@ -63,7 +63,8 @@ INGESTION_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $INGESTION_ID
 
 ```bash
 az deployment group create -f workload-stamp.json -g $ACR_RESOURCE_GROUP -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
--p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
+-p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
+-p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
 -p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
 -p packagePrincipalId=$PACKAGE_ID_PRINCIPAL_ID \
 -p acrResourceGroupName=$ACR_RESOURCE_GROUP
