@@ -47,20 +47,27 @@ ACR_RESOURCE_GROUP=$(az deployment sub show -n workload-stamp-prereqs --query pr
 ### Get the workload user assigned identities
 
 ```bash
-DELIVERY_ID_NAME=$(az deployment group show -g $ACR_RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.deliveryIdName.value -o tsv) && \
-DELIVERY_PRINCIPAL_ID=$(az identity show -g $ACR_RESOURCE_GROUP -n $DELIVERY_ID_NAME --query principalId -o tsv) && \
-DRONESCHEDULER_ID_NAME=$(az deployment group show -g $ACR_RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.droneSchedulerIdName.value -o tsv) && \
-DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g $ACR_RESOURCE_GROUP -n $DRONESCHEDULER_ID_NAME --query principalId -o tsv) && \
-WORKFLOW_ID_NAME=$(az deployment group show -g $ACR_RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.workflowIdName.value -o tsv) && \
-WORKFLOW_PRINCIPAL_ID=$(az identity show -g $ACR_RESOURCE_GROUP -n $WORKFLOW_ID_NAME --query principalId -o tsv)
-
+DELIVERY_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.deliveryIdName.value -o tsv) && \
+DELIVERY_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DELIVERY_ID_NAME --query principalId -o tsv) && \
+DRONESCHEDULER_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.droneSchedulerIdName.value -o tsv) && \
+DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DRONESCHEDULER_ID_NAME --query principalId -o tsv) && \
+WORKFLOW_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.workflowIdName.value -o tsv) && \
+WORKFLOW_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $WORKFLOW_ID_NAME --query principalId -o tsv) && \
+PACKAGE_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.packageIdName.value -o tsv) && \
+PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $PACKAGE_ID_NAME --query principalId -o tsv) && \
+INGESTION_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.ingestionIdName.value -o tsv) && \
+INGESTION_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $INGESTION_ID_NAME --query principalId -o tsv)
 ```
 
 ### Deploy the workload
 
 ```bash
 az deployment group create -f workload-stamp.json -g $ACR_RESOURCE_GROUP -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
--p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID
+-p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
+-p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
+-p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
+-p packagePrincipalId=$PACKAGE_ID_PRINCIPAL_ID \
+-p acrResourceGroupName=$ACR_RESOURCE_GROUP
 ```
 
 ### Assign ACR variables
