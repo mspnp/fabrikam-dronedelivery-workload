@@ -526,6 +526,18 @@
                         "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]",
                         "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
                     ]
+                },
+                {
+                    "type": "secrets",
+                    "name": "Queue--Key",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('ingestionSBNamespace'), variables('ingestionServiceAccessKeyName')), '2017-04-01').primaryKey]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]",
+                        "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('ingestionSBNamespace'), variables('ingestionServiceAccessKeyName'))]"
+                    ]
                 }
             ]
         },
