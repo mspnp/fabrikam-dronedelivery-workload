@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 as base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 as base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
 WORKDIR /app
 COPY Fabrikam.DroneDelivery.Common/*.csproj ./Fabrikam.DroneDelivery.Common/
@@ -30,8 +30,10 @@ FROM build AS publish
 
 MAINTAINER Fernando Antivero (https://github.com/ferantivero)
 
+RUN find -type d -name bin -prune -exec rm -rf {} \; && find -type d -name obj -prune -exec rm -rf {} \;
+
 WORKDIR /app
-RUN dotnet publish /app/Fabrikam.DroneDelivery.DeliveryService/ -c release -o ./out --no-restore
+RUN dotnet publish /app/Fabrikam.DroneDelivery.DeliveryService/ -c release -o ./out 
 
 FROM base AS runtime
 
