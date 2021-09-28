@@ -4,7 +4,7 @@ As part of the initial creation of this workload, load tests were performed to e
 
 However, the narative surounding the tests were captured on Microsoft Docs at [Performance tuning scenario: Multiple backend services](https://docs.microsoft.com/azure/architecture/performance/backend-services).
 
-Below are excepts from the findings of that excercize. While the deployments are no longer available, the matrics that were evaluated are still interesting to review.
+Below are excepts from the findings of that excercize. While the deployments are no longer available, the matrics that were evaluated are still interesting to review as are some of the Azure Monitor queries used to gather the results.
 
 ## Scenarios
 
