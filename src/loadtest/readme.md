@@ -1,14 +1,12 @@
-# Invoice Load Testing
+# Load Testing
 
 As part of the initial creation of this workload, load tests were performed to ensure it met the business requirements for the scenario. This directory contained these load tests. They were however based on the legacy [Visual Studio 2017 Load Testing](https://docs.microsoft.com/visualstudio/test/walkthrough-create-and-run-a-load-test) solution. As such they have been removed, as they can no longer be supported.
 
 However, the narative surounding the tests were captured on Microsoft Docs at [Performance tuning scenario: Multiple backend services](https://docs.microsoft.com/azure/architecture/performance/backend-services).
 
-## Excepts from results
+Below are excepts from the findings of that excercize. While the deployments are no longer available, the matrics that were evaluated are still interesting to review.
 
-Below are excepts from the findings.  While the specific numbers might not be interesting, you might find what was looked for/tested to be interesting.
-
-### Scenarios
+## Scenarios
 
 Internally, the DroneScheduler service executes a SQL query similar to the following:
 
@@ -21,19 +19,19 @@ WHERE c.ownerId = <ownerIdValue> and
 
 There were four scenarios tested to show how changes impacted the solution.
 
-#### Throttling scenario
+### Throttling scenario
 
 In this scenario, the DroneScheduler service does not specify a partition key in the query. It configures the Cosmos DB client SDK to use [gateway mode](https://docs.microsoft.com/azure/cosmos-db/performance-tips) with `MaxDegreeParallelism = 0`. Cosmos DB resource untis (RUs) are set to `900`.
 
-#### Serial cross-partition query scenario
+### Serial cross-partition query scenario
 
 This scenario uses the same settings as the Throttling scenario, but increases the Cosmos DB RU allocation to `2500`.
 
-#### Parallel cross-partition query scenario
+### Parallel cross-partition query scenario
 
 This scenario adds parallelism to the Cosmos DB queries by setting `MaxDegreeParallelism = -1`.
 
-#### Single-partition scenario
+### Single-partition scenario
 
 In this scenario, the query includes a partition key, resulting in a single-partition query. It also uses [direct mode](https://docs.microsoft.com/azure/cosmos-db/performance-tips) rather than gateway mode.
 
@@ -61,9 +59,9 @@ In this scenario, the query includes a partition key, resulting in a single-part
 | How to scale?                           | increment resource units up to 2.5K                             | increase parallelization by setting MaxParallelization -1        | specify a frequent partition key                    | scale up or out                                               | Conclusions from bottlenecks                                         |
 |                                         |                                                                 |                                                                  | change to Direct Mode when possible                 |                                                               |                                                                      |
 
-### Throttling scenario results
+## Throttling scenario results
 
-#### [1] Metrics per service
+### [1] Metrics per service
 
 |                                          | Replicas | ~Max CPU (mc) | ~Max Mem (MB) | Avg. Throughput*        | Max. Throughput*        | Avg (ms) | 50<sup>th</sup> (ms) | 95<sup>th</sup> (ms) | 99<sup>th</sup> (ms) |
 |------------------------------------------|----------|---------------|---------------|-------------------------|-------------------------|----------|-----------|-----------|-----------|
@@ -77,16 +75,16 @@ In this scenario, the query includes a partition key, resulting in a single-part
 2. Avg/50<sup>th</sup>/95<sup>th</sup>/99<sup>th</sup>: Azure AppInsights Performance operations
 3. CPU/Mem: Azure Monitor for Containers
 
-#### [1] Overal cluster metrics
+### [1] Overal cluster metrics
 
   - 3 x Standard D2 v2 (2 vcpus, 7 GiB memory)
   - Max. CPU: 80.22%
   - Avg. CPU: 23.93%
 
 
-#### [1] Cosmos DB Container Metrics
+### [1] Cosmos DB Container Metrics
 
-##### [1] RUs charge custom metric
+#### [1] RUs charge custom metric
 
 - Total Number of successful requests: 9850
 - Average of dependency calls per GET operation: 11
@@ -128,7 +126,7 @@ dataset
     TotalQueryRUCharge=(AvgRUChargePerQuery*SuccessRequests);
 ```
 
-##### [1] Max consumed RUs per partition
+#### [1] Max consumed RUs per partition
 
   - Db Size: 11 GB
   - Number of Physical partitions: 9
@@ -136,7 +134,7 @@ dataset
   - Max consumption per partition: 136
   - Provisioned per partition: : 100
 
-##### [1] Requests
+#### [1] Requests
 
   - Http 2xx(2): 98905 (Max ~287 requests/sec)
   - Http 429(s): 16071
@@ -160,14 +158,14 @@ dataset
     Http429=sumif(itemCount, resultCode == "429")
 ```
 
-#### [1] Failures
+### [1] Failures
 
   - other failures: 10190
 
 
-### Serial cross-partition query scenario results
+## Serial cross-partition query scenario results
 
-#### [2] Metrics per service
+### [2] Metrics per service
 
 |                                          | Replicas | ~Max CPU (mc) | ~Max Mem (MB) | Avg. Throughput*        | Max. Throughput*        | Avg (ms) | 50<sup>th</sup> (ms) | 95<sup>th</sup> (ms) | 99<sup>th</sup> (ms) |
 |------------------------------------------|----------|---------------|---------------|-------------------------|-------------------------|----------|-----------|-----------|-----------|
@@ -182,15 +180,15 @@ dataset
 3. CPU/Mem: Azure Monitor for Containers
 
 
-#### [2] Overal cluster metrics
+### [2] Overal cluster metrics
 
   - 3 x Standard D2 v2 (2 vcpus, 7 GiB memory)
   - Max. CPU: 100.91%
   - Avg. CPU: 28.40%
 
-#### [2] Cosmos DB Container Metrics
+### [2] Cosmos DB Container Metrics
 
-##### [2] RUs charge custom metric
+#### [2] RUs charge custom metric
 
 - Total Number of successful requests: 10901
 - Average of dependency calls per GET operation: 9
@@ -232,7 +230,7 @@ dataset
     TotalQueryRUCharge=(AvgRUChargePerQuery*SuccessRequests);
 ```
 
-##### [2] Max consumed RUs per partition
+#### [2] Max consumed RUs per partition
 
   - Db Size: 11 GB
   - Number of Physical partitions: 9
@@ -240,9 +238,7 @@ dataset
   - Max consumption per partition: 153
   - Provisioned per partition: : ~278
 
-![](./imgs/consumed-vs-provisioned-L.png)
-
-##### [2] Requests
+#### [2] Requests
 
   - Http 2xx(2): 108790 (Max ~352 requests/sec)
   - Http 429(s): 0
@@ -266,13 +262,13 @@ dataset
     Http429=sumif(itemCount, resultCode == "429")
 ```
 
-#### [2] Failures
+### [2] Failures
 
   - other failures: 0
 
-### Parallel cross-partition query scenario  results
+## Parallel cross-partition query scenario results
 
-#### [3] Metrics per service
+### [3] Metrics per service
 
 |                                          | Replicas | ~Max CPU (mc) | ~Max Mem (MB) | Avg. Throughput*        | Max. Throughput*        | Avg (ms) | 50<sup>th</sup> (ms) | 95<sup>th</sup> (ms) | 99<sup>th</sup> (ms) |
 |------------------------------------------|----------|---------------|---------------|-------------------------|-------------------------|----------|-----------|-----------|-----------|
@@ -286,15 +282,15 @@ dataset
 2. Avg/50<sup>th</sup>/95<sup>th</sup>/99<sup>th</sup>: Azure AppInsights Performance operations
 3. CPU/Mem: Azure Monitor for Containers
 
-#### [3] Overal cluster metrics
+### [3] Overal cluster metrics
 
   - 3 x Standard D2 v2 (2 vcpus, 7 GiB memory)
   - Max. CPU: 98.75%
   - Avg. CPU: 37.12%
 
-#### [3] Cosmos DB Container Metrics
+### [3] Cosmos DB Container Metrics
 
-##### [3] RUs charge custom metric
+#### [3] RUs charge custom metric
 
 - Total Number of successful requests: 20162
 - Average of dependency calls per GET operation: 29
@@ -336,7 +332,7 @@ dataset
     TotalQueryRUCharge=(AvgRUChargePerQuery*SuccessRequests);
 ```
 
-##### [3] Max consumed RUs per partition
+#### [3] Max consumed RUs per partition
 
   - Db Size: 11 GB
   - Number of Physical partitions: 9
@@ -344,7 +340,7 @@ dataset
   - Max consumption per partition: 250
   - Provisioned per partition: : ~278
 
-##### [3] Requests
+#### [3] Requests
 
   - Http 2xx(2): 201620  (Max ~ 616 requests/sec)
   - Http 429(s): 0
@@ -368,13 +364,13 @@ dataset
     Http429=sumif(itemCount, resultCode == "429")
 ```
 
-#### [3] Failures
+### [3] Failures
 
   - other failures: 0
 
-### Single-partition scenario results
+## Single-partition scenario results
 
-#### [4] Metrics per service
+### [4] Metrics per service
 
 |                                          | Replicas | ~Max CPU (mc) | ~Max Mem (MB) | Avg. Throughput*        | Max. Throughput*        | Avg (ms) | 50<sup>th</sup> (ms) | 95<sup>th</sup> (ms) | 99<sup>th</sup> (ms) |
 |------------------------------------------|----------|---------------|---------------|-------------------------|-------------------------|----------|-----------|-----------|-----------|
@@ -388,15 +384,15 @@ dataset
 2. Avg/50<sup>th</sup>/95<sup>th</sup>/99<sup>th</sup>: Azure AppInsights Performance operations
 3. CPU/Mem: Azure Monitor for Containers
 
-#### [4] Overal cluster metrics
+### [4] Overal cluster metrics
 
   - 3 x Standard D2 v2 (2 vcpus, 7 GiB memory)
   - Max. CPU: 98.99 %
   - Avg. CPU: 46.12 %
 
-#### [4] Cosmos DB Container Metrics
+### [4] Cosmos DB Container Metrics
 
-##### [4] RUs charge custom metric
+#### [4] RUs charge custom metric
 
 - Total Number of successful requests: 28616
 - Average of dependency calls per GET operation: 1
@@ -438,7 +434,7 @@ dataset
     TotalQueryRUCharge=(AvgRUChargePerQuery*SuccessRequests);
 ```
 
-##### [4] Max consumed RUs per partition
+#### [4] Max consumed RUs per partition
 
   - Db Size: 11 GB
   - Number of Physical partitions: 9
@@ -446,7 +442,7 @@ dataset
   - Max consumption per partition: 69
   - Provisioned per partition: : ~278
 
-##### [4] Requests
+#### [4] Requests
 
   - Http 2xx(2): 28661 (Max ~98 requests/sec)
   - Http 429(s): 0
@@ -477,7 +473,7 @@ dataset
             | summarize sum(itemCount))) // for direct mode
 ```
 
-#### [4] Failures
+### [4] Failures
 
   - other failures: 0
 
