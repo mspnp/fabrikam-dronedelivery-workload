@@ -8,12 +8,6 @@
         }
     },
     "variables": {
-        "deliveryIdName": "dev-d",
-        "workflowIdName": "dev-wf",
-        "droneSchedulerIdName": "dev-ds",
-        "ingestionIdName": "dev-ing",
-        "packageIdName": "dev-pk",
-        "acrResourceGroupName": "[concat(parameters('resourceGroupName'),'-acr')]"
     },
     "resources": [
         {
@@ -50,7 +44,7 @@
                     "resources": [
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('workflowIdName')]",
+                            "name": "uid-workflow",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -62,7 +56,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('deliveryIdName')]",
+                            "name": "uid-delivery",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -74,7 +68,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('droneSchedulerIdName')]",
+                            "name": "uid-dronescheduler",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -86,7 +80,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('ingestionIdName')]",
+                            "name": "uid-ingestion",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -98,7 +92,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('packageIdName')]",
+                            "name": "uid-package",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -110,26 +104,6 @@
                         }
                     ],
                     "outputs": {
-                        "deliveryIdName": {
-                            "value": "[variables('deliveryIdName')]",
-                            "type": "string"
-                        },
-                        "droneSchedulerIdName": {
-                            "value": "[variables('droneSchedulerIdName')]",
-                            "type": "string"
-                        },
-                        "workflowIdName": {
-                            "value": "[variables('workflowIdName')]",
-                            "type": "string"
-                        },
-                        "ingestionIdName": {
-                            "value": "[variables('ingestionIdName')]",
-                            "type": "string"
-                        },
-                        "packageIdName": {
-                            "value": "[variables('packageIdName')]",
-                            "type": "string"
-                        }
                     }
                 }
             }

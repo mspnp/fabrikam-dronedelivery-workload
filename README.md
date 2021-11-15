@@ -37,16 +37,11 @@ az deployment sub create --name workload-stamp-prereqs --location eastus --templ
 ### Get the workload user assigned identities
 
 ```bash
-DELIVERY_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.deliveryIdName.value -o tsv) && \
-DELIVERY_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DELIVERY_ID_NAME --query principalId -o tsv) && \
-DRONESCHEDULER_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.droneSchedulerIdName.value -o tsv) && \
-DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DRONESCHEDULER_ID_NAME --query principalId -o tsv) && \
-WORKFLOW_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.workflowIdName.value -o tsv) && \
-WORKFLOW_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $WORKFLOW_ID_NAME --query principalId -o tsv) && \
-PACKAGE_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.packageIdName.value -o tsv) && \
-PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $PACKAGE_ID_NAME --query principalId -o tsv) && \
-INGESTION_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.ingestionIdName.value -o tsv) && \
-INGESTION_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $INGESTION_ID_NAME --query principalId -o tsv)
+DELIVERY_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-delivery --query principalId -o tsv) && \
+DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-dronescheduler --query principalId -o tsv) && \
+WORKFLOW_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-workflow --query principalId -o tsv) && \
+PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-package --query principalId -o tsv) && \
+INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-ingestion --query principalId -o tsv)
 ```
 
 ### Deploy the workload

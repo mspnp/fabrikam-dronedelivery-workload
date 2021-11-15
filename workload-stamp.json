@@ -12,11 +12,11 @@
         "droneSchedulerCosmosDbName": "[concat('ds-',uniqueString(resourceGroup().id))]",
         "deliveryRedisName": "[concat('dr-',uniqueString(resourceGroup().id))]",
         "deliveryKeyVaultName": "[concat('dkv-',uniqueString(resourceGroup().id))]",
-        "deliveryIdName": "dev-d",
-        "workflowIdName": "dev-wf",
-        "droneSchedulerIdName": "dev-ds",
-        "ingestionIdName": "dev-in",
-        "packageIdName": "dev-pk",
+        "deliveryIdName": "uid-delivery",
+        "workflowIdName": "uid-workflow",
+        "droneSchedulerIdName": "uid-dronescheduler",
+        "ingestionIdName": "uid-ingestion",
+        "packageIdName": "uid-package",
         "packageKeyVaultName": "[concat('pkkv-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespace": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespaceSKU": "Premium",
@@ -30,7 +30,6 @@
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
         "appInsightsName": "[concat('ai-', uniqueString(resourceGroup().id))]",
         "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
-
     },
     "parameters": {
         "location": {
