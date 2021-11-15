@@ -2,9 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "0.0.0.3",
     "parameters": {
-        "resourceGroupName": {
-            "type": "string"
-        },
         "resourceGroupLocation": {
             "type": "string",
             "defaultValue": "eastus"
@@ -20,7 +17,7 @@
     },
     "resources": [
         {
-            "name": "[parameters('resourceGroupName')]",
+            "name": "rg-shipping-dronedelivery",
             "location": "[parameters('resourceGroupLocation')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2018-05-01",
@@ -29,7 +26,7 @@
             }
         },
         {
-            "name": "[variables('acrResourceGroupName')]",
+            "name": "rg-shipping-dronedelivery-acr",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2018-05-01",
             "location": "[parameters('resourceGroupLocation')]",
@@ -41,9 +38,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-05-01",
             "name": "workload-stamp-prereqs-dep",
-            "resourceGroup": "[parameters('resourceGroupName')]",
+            "resourceGroup": "rg-shipping-dronedelivery",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGroupName'))]"
+                "[resourceId('Microsoft.Resources/resourceGroups/', 'rg-shipping-dronedelivery')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -139,9 +136,5 @@
         }
     ],
     "outputs": {
-        "acrResourceGroupName": {
-            "value": "[variables('acrResourceGroupName')]",
-            "type": "string"
-        }
     }
 }

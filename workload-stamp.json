@@ -101,12 +101,6 @@
         },
         "packagePrincipalId": {
             "type": "string"
-        },
-        "acrResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "the resource group name of the Azure Container Registry"
-            }
         }
     },
     "resources": [
@@ -116,7 +110,7 @@
             "apiVersion": "2018-05-01",
             "dependsOn": [
             ],
-            "resourceGroup": "[parameters('acrResourceGroupName')]",
+            "resourceGroup": "rg-shipping-dronedelivery-acr",
             "properties": {
                 "mode": "Incremental",
                 "template": {
