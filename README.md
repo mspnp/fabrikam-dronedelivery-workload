@@ -47,7 +47,7 @@ INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid
 ### Deploy the workload
 
 ```bash
-az deployment group create -f workload-stamp.json -g rg-shipping-dronedelivery-acr -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
+az deployment group create -f workload-stamp.json -g rg-shipping-dronedelivery -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
 -p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
 -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
 -p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
@@ -57,7 +57,7 @@ az deployment group create -f workload-stamp.json -g rg-shipping-dronedelivery-a
 ### Assign ACR variables
 
 ```bash
-ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery-acr -n workload-stamp --query properties.outputs.acrName.value -o tsv)
+ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery -n workload-stamp --query properties.outputs.acrName.value -o tsv)
 ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
 ```
 
