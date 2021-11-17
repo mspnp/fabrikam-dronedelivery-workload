@@ -12,11 +12,6 @@
         "droneSchedulerCosmosDbName": "[concat('ds-',uniqueString(resourceGroup().id))]",
         "deliveryRedisName": "[concat('dr-',uniqueString(resourceGroup().id))]",
         "deliveryKeyVaultName": "[concat('dkv-',uniqueString(resourceGroup().id))]",
-        "deliveryIdName": "dev-d",
-        "workflowIdName": "dev-wf",
-        "droneSchedulerIdName": "dev-ds",
-        "ingestionIdName": "dev-in",
-        "packageIdName": "dev-pk",
         "packageKeyVaultName": "[concat('pkkv-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespace": "[concat('i-',uniqueString(resourceGroup().id))]",
         "ingestionSBNamespaceSKU": "Premium",
@@ -30,7 +25,6 @@
         "workflowServiceAccessKeyName": "WorkflowServiceAccessKey",
         "appInsightsName": "[concat('ai-', uniqueString(resourceGroup().id))]",
         "nestedACRDeploymentName": "[concat(resourceGroup().name, '-acr-deployment')]"
-
     },
     "parameters": {
         "location": {
@@ -101,12 +95,6 @@
         },
         "packagePrincipalId": {
             "type": "string"
-        },
-        "acrResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "the resource group name of the Azure Container Registry"
-            }
         }
     },
     "resources": [
@@ -116,7 +104,7 @@
             "apiVersion": "2018-05-01",
             "dependsOn": [
             ],
-            "resourceGroup": "[parameters('acrResourceGroupName')]",
+            "resourceGroup": "rg-shipping-dronedelivery-acr",
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -793,7 +781,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2021-04-01-preview",
-            "name": "[concat(variables('deliveryKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('deliveryIdName'), resourceGroup().id), variables('readerRole')))]",
+            "name": "[concat(variables('deliveryKeyVaultName'), '/Microsoft.Authorization/', guid(concat('uid-delivery', resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('deliveryKeyVaultName'))]"
             ],
@@ -813,7 +801,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2021-04-01-preview",
-            "name": "[concat(variables('workflowKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('workflowIdName'), resourceGroup().id), variables('readerRole')))]",
+            "name": "[concat(variables('workflowKeyVaultName'), '/Microsoft.Authorization/', guid(concat('uid-workflow', resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('workflowKeyVaultName'))]"
             ],
@@ -833,7 +821,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2021-04-01-preview",
-            "name": "[concat(variables('droneSchedulerKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('droneSchedulerIdName'), resourceGroup().id), variables('readerRole')))]",
+            "name": "[concat(variables('droneSchedulerKeyVaultName'), '/Microsoft.Authorization/', guid(concat('uid-dronescheduler', resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('droneSchedulerKeyVaultName'))]"
             ],
@@ -853,7 +841,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2021-04-01-preview",
-            "name": "[concat(variables('ingestionKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('ingestionIdName'), resourceGroup().id), variables('readerRole')))]",
+            "name": "[concat(variables('ingestionKeyVaultName'), '/Microsoft.Authorization/', guid(concat('uid-ingestion', resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('ingestionKeyVaultName'))]"
             ],
@@ -873,7 +861,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2021-04-01-preview",
-            "name": "[concat(variables('packageKeyVaultName'), '/Microsoft.Authorization/', guid(concat(variables('packageIdName'), resourceGroup().id), variables('readerRole')))]",
+            "name": "[concat(variables('packageKeyVaultName'), '/Microsoft.Authorization/', guid(concat('uid-package', resourceGroup().id), variables('readerRole')))]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('packageKeyVaultName'))]"
             ],

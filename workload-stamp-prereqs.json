@@ -2,25 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "0.0.0.3",
     "parameters": {
-        "resourceGroupName": {
-            "type": "string"
-        },
         "resourceGroupLocation": {
             "type": "string",
             "defaultValue": "eastus"
         }
     },
     "variables": {
-        "deliveryIdName": "dev-d",
-        "workflowIdName": "dev-wf",
-        "droneSchedulerIdName": "dev-ds",
-        "ingestionIdName": "dev-ing",
-        "packageIdName": "dev-pk",
-        "acrResourceGroupName": "[concat(parameters('resourceGroupName'),'-acr')]"
     },
     "resources": [
         {
-            "name": "[parameters('resourceGroupName')]",
+            "name": "rg-shipping-dronedelivery",
             "location": "[parameters('resourceGroupLocation')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2018-05-01",
@@ -29,7 +20,7 @@
             }
         },
         {
-            "name": "[variables('acrResourceGroupName')]",
+            "name": "rg-shipping-dronedelivery-acr",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2018-05-01",
             "location": "[parameters('resourceGroupLocation')]",
@@ -41,9 +32,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-05-01",
             "name": "workload-stamp-prereqs-dep",
-            "resourceGroup": "[parameters('resourceGroupName')]",
+            "resourceGroup": "rg-shipping-dronedelivery",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGroupName'))]"
+                "[resourceId('Microsoft.Resources/resourceGroups/', 'rg-shipping-dronedelivery')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -53,7 +44,7 @@
                     "resources": [
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('workflowIdName')]",
+                            "name": "uid-workflow",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -65,7 +56,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('deliveryIdName')]",
+                            "name": "uid-delivery",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -77,7 +68,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('droneSchedulerIdName')]",
+                            "name": "uid-dronescheduler",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -89,7 +80,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('ingestionIdName')]",
+                            "name": "uid-ingestion",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -101,7 +92,7 @@
                         },
                         {
                             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "name": "[variables('packageIdName')]",
+                            "name": "uid-package",
                             "apiVersion": "2015-08-31-preview",
                             "location": "[parameters('resourceGroupLocation')]",
                             "tags": {
@@ -113,35 +104,11 @@
                         }
                     ],
                     "outputs": {
-                        "deliveryIdName": {
-                            "value": "[variables('deliveryIdName')]",
-                            "type": "string"
-                        },
-                        "droneSchedulerIdName": {
-                            "value": "[variables('droneSchedulerIdName')]",
-                            "type": "string"
-                        },
-                        "workflowIdName": {
-                            "value": "[variables('workflowIdName')]",
-                            "type": "string"
-                        },
-                        "ingestionIdName": {
-                            "value": "[variables('ingestionIdName')]",
-                            "type": "string"
-                        },
-                        "packageIdName": {
-                            "value": "[variables('packageIdName')]",
-                            "type": "string"
-                        }
                     }
                 }
             }
         }
     ],
     "outputs": {
-        "acrResourceGroupName": {
-            "value": "[variables('acrResourceGroupName')]",
-            "type": "string"
-        }
     }
 }

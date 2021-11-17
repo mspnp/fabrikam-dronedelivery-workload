@@ -26,54 +26,38 @@ The Drone Delivery application is a sample application that consists of several 
 az login
 ```
 
-### Set the resource group variable
-
-```bash
-RESOURCE_GROUP=rg-shipping-dronedelivery
-```
-
 ### Deploy the workload's prerequisites
 
 ```bash
-az deployment sub create --name workload-stamp-prereqs --location eastus --template-file workload-stamp-prereqs.json --parameters resourceGroupName=$RESOURCE_GROUP resourceGroupLocation=eastus
+az deployment sub create --name workload-stamp-prereqs --location eastus --template-file workload-stamp-prereqs.json
 ```
 
-### Get the Azure Container Registry and workload resource group name
-
-```bash
-ACR_RESOURCE_GROUP=$(az deployment sub show -n workload-stamp-prereqs --query properties.outputs.acrResourceGroupName.value -o tsv)
-```
+:book: This pre-flight ARM template is creating a general purpose resource group  as well as one dedicated for the Azure Container Registry. Additionally five User Identites are provisioned as part of this too that will be later associated to every containerized microservice. This is because they will need Azure RBAC roles over the Azure KeyVault to read secrets in runtime.
 
 ### Get the workload user assigned identities
 
 ```bash
-DELIVERY_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.deliveryIdName.value -o tsv) && \
-DELIVERY_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DELIVERY_ID_NAME --query principalId -o tsv) && \
-DRONESCHEDULER_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.droneSchedulerIdName.value -o tsv) && \
-DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $DRONESCHEDULER_ID_NAME --query principalId -o tsv) && \
-WORKFLOW_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.workflowIdName.value -o tsv) && \
-WORKFLOW_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $WORKFLOW_ID_NAME --query principalId -o tsv) && \
-PACKAGE_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.packageIdName.value -o tsv) && \
-PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $PACKAGE_ID_NAME --query principalId -o tsv) && \
-INGESTION_ID_NAME=$(az deployment group show -g $RESOURCE_GROUP -n workload-stamp-prereqs-dep --query properties.outputs.ingestionIdName.value -o tsv) && \
-INGESTION_ID_PRINCIPAL_ID=$(az identity show -g $RESOURCE_GROUP -n $INGESTION_ID_NAME --query principalId -o tsv)
+DELIVERY_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-delivery --query principalId -o tsv) && \
+DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-dronescheduler --query principalId -o tsv) && \
+WORKFLOW_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-workflow --query principalId -o tsv) && \
+PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-package --query principalId -o tsv) && \
+INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-ingestion --query principalId -o tsv)
 ```
 
 ### Deploy the workload
 
 ```bash
-az deployment group create -f workload-stamp.json -g $ACR_RESOURCE_GROUP -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
+az deployment group create -f workload-stamp.json -g rg-shipping-dronedelivery-acr -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
 -p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
 -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
 -p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
--p packagePrincipalId=$PACKAGE_ID_PRINCIPAL_ID \
--p acrResourceGroupName=$ACR_RESOURCE_GROUP
+-p packagePrincipalId=$PACKAGE_ID_PRINCIPAL_ID
 ```
 
 ### Assign ACR variables
 
 ```bash
-ACR_NAME=$(az deployment group show -g  $ACR_RESOURCE_GROUP -n workload-stamp --query properties.outputs.acrName.value -o tsv)
+ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery-acr -n workload-stamp --query properties.outputs.acrName.value -o tsv)
 ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
 ```
 
