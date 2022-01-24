@@ -900,6 +900,10 @@
             "value": "[variables('deliveryCosmosDbName')]",
             "type": "string"
         },
+        "deliveryRedisName": {
+            "value": "[variables('deliveryRedisName')]",
+            "type": "string"
+        },
         "droneSchedulerCosmosDbName": {
             "value": "[variables('droneSchedulerCosmosDbName')]",
             "type": "string"
