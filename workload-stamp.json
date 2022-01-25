@@ -924,6 +924,10 @@
             "value": "[variables('workflowKeyVaultName')]",
             "type": "string"
         },
+        "workflowServiceAccessKeyName": {
+          "value": "[variables('workflowServiceAccessKeyName')]",
+          "type": "string"
+        },
         "deliveryKeyVaultName": {
             "value": "[variables('deliveryKeyVaultName')]",
             "type": "string"
