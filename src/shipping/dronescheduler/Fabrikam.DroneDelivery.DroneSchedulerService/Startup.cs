@@ -37,7 +37,6 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService
             services.AddFeatureManagement();
 
             // Configure AppInsights
-            services.AddApplicationInsightsKubernetesEnricher();
             services.AddApplicationInsightsTelemetry(Configuration);
 
             // Add framework services.
