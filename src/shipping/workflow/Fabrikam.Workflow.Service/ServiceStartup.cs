@@ -23,7 +23,6 @@ namespace Fabrikam.Workflow.Service
             services.AddOptions();
 
             // Configure AppInsights
-            services.AddApplicationInsightsKubernetesEnricher();
             services.AddApplicationInsightsTelemetry(context.Configuration);
 
             services.Configure<WorkflowServiceOptions>(context.Configuration);
