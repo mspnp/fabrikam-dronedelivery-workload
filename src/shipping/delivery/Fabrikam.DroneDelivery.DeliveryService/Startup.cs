@@ -3,6 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using System;
+using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +38,7 @@ namespace Fabrikam.DroneDelivery.DeliveryService
 
             if (buildConfig["KEY_VAULT_URI"] is var keyVaultUri && !string.IsNullOrEmpty(keyVaultUri))
             {
-                builder.AddAzureKeyVault(keyVaultUri);
+                builder.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
             }
 
             Configuration = builder.Build();
