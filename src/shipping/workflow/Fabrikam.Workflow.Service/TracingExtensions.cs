@@ -22,7 +22,7 @@ using Microsoft.Extensions.Options;
 namespace Fabrikam.Workflow.Service
 {
     /// <summary>
-    /// Application Insights setup class based on https://docs.microsoft.com/en-us/azure/azure-monitor/app/console
+    /// Application Insights setup class based on https://learn.microsoft.com/azure/azure-monitor/app/console
     /// </summary>
     /// <remarks>
     /// Telemetry Modules initialization as expected based on https://github.com/Microsoft/ApplicationInsights-aspnetcore/blob/04b5485d4a8aa498b2d99c60bdf8ca59bc9103fc/src/Microsoft.ApplicationInsights.AspNetCore/Implementation/TelemetryConfigurationOptions.cs#L27
