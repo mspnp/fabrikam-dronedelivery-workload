@@ -1,8 +1,8 @@
 # Load Testing
 
-As part of the initial creation of this workload, load tests were performed to ensure it met the business requirements for the scenario. This directory contained these load tests. They were however based on the legacy [Visual Studio 2017 Load Testing](https://docs.microsoft.com/visualstudio/test/walkthrough-create-and-run-a-load-test) solution. As such they have been removed, as they can no longer be supported.
+As part of the initial creation of this workload, load tests were performed to ensure it met the business requirements for the scenario. This directory contained these load tests. They were however based on the legacy [Visual Studio 2017 Load Testing](https://learn.microsoft.com/visualstudio/test/walkthrough-create-and-run-a-load-test) solution. As such they have been removed, as they can no longer be supported.
 
-However, the narative surounding the tests were captured on Microsoft Docs at [Performance tuning scenario: Multiple backend services](https://docs.microsoft.com/azure/architecture/performance/backend-services).
+However, the narative surounding the tests were captured on Microsoft Docs at [Performance tuning scenario: Multiple backend services](https://learn.microsoft.com/azure/architecture/performance/backend-services).
 
 Below are excepts from the findings of that excercize. While the deployments are no longer available, the matrics that were evaluated are still interesting to review as are some of the Azure Monitor queries used to gather the results.
 
@@ -21,7 +21,7 @@ There were four scenarios tested to show how changes impacted the solution.
 
 ### Throttling scenario
 
-In this scenario, the DroneScheduler service does not specify a partition key in the query. It configures the Cosmos DB client SDK to use [gateway mode](https://docs.microsoft.com/azure/cosmos-db/performance-tips) with `MaxDegreeParallelism = 0`. Cosmos DB resource untis (RUs) are set to `900`.
+In this scenario, the DroneScheduler service does not specify a partition key in the query. It configures the Cosmos DB client SDK to use [gateway mode](https://learn.microsoft.com/azure/cosmos-db/performance-tips) with `MaxDegreeParallelism = 0`. Cosmos DB resource untis (RUs) are set to `900`.
 
 ### Serial cross-partition query scenario
 
@@ -33,7 +33,7 @@ This scenario adds parallelism to the Cosmos DB queries by setting `MaxDegreePar
 
 ### Single-partition scenario
 
-In this scenario, the query includes a partition key, resulting in a single-partition query. It also uses [direct mode](https://docs.microsoft.com/azure/cosmos-db/performance-tips) rather than gateway mode.
+In this scenario, the query includes a partition key, resulting in a single-partition query. It also uses [direct mode](https://learn.microsoft.com/azure/cosmos-db/performance-tips) rather than gateway mode.
 
 ## Test results and metrics
 

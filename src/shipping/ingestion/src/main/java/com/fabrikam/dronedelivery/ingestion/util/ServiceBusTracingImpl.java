@@ -93,8 +93,8 @@ public class ServiceBusTracingImpl implements ServiceBusTracing {
 							.getId();
 
 		// propagate Service Bus required properties
-		// https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-end-to-end-tracing
-		// https://docs.microsoft.com/en-us/azure/azure-monitor/app/correlation#telemetry-correlation-in-the-java-sdk
+		// https://learn.microsoft.com/azure/service-bus-messaging/service-bus-end-to-end-tracing
+		// https://learn.microsoft.com/azure/azure-monitor/app/correlation#telemetry-correlation-in-the-java-sdk
 		message.getProperties().put(DIAGNOSTIC_ID_PROPERTY_NAME, parentId);
 	}
 
