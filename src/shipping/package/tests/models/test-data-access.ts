@@ -5,7 +5,8 @@
 
 import { Package } from '../../app/models/package';
 import { Repository } from '../../app/models/repository'
-import { ObjectID } from 'mongodb';
+const mdb = require('mongodb');
+const { ObjectID } = mdb;
 
 var MongoClient = require('mongodb').MongoClient;
 
@@ -17,7 +18,7 @@ describe('Repository', function() {
 
     var connectionUrl = 'mongodb://packagedb:27017/local';
     var MongoClient = require('mongodb').MongoClient;
-    var db;
+    var db:any;
     var repository = new Repository();
 
     before(async function() {

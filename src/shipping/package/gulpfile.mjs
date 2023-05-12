@@ -1,8 +1,8 @@
-var gulp = require('gulp');
-var ts = require('gulp-typescript');
-var nodemon = require('gulp-nodemon');
-var del = require('del');
-var mocha = require('gulp-mocha');
+import gulp from 'gulp';
+import ts from 'gulp-typescript';
+import nodemon from 'gulp-nodemon';
+import { deleteAsync as del } from 'del';
+import mocha from 'gulp-mocha';
 
 gulp.task('set-env', gulp.series(function(done) {
     process.env.CONNECTION_STRING = "mongodb://packagedb:27017/local";

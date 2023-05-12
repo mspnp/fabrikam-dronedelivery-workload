@@ -35,7 +35,7 @@ export class Repository
         var collection = this.collection();
         var result = await collection.insertOne(p);
         return UpsertStatus.Created;
-    } catch (ex) {
+    } catch (ex: any) {
         if (ex.code == MongoErrors.DuplicateKey) {
             var result = await collection.updateOne({"_id": p._id, "tag": p.tag}, {$set: p}, {upsert:true});
             return result.upsertedCount > 0 ? UpsertStatus.Created : UpsertStatus.Updated;
@@ -60,7 +60,7 @@ export class Repository
     // we could simpley add/remove/change the model in the api vs database
     let apiPkg = new apiModels.Package();
     apiPkg.id = pkg._id;
-    apiPkg.size = pkg.size ? pkg.size.toString() : null;
+    apiPkg.size = pkg.size ? pkg.size.toString() : '';
     apiPkg.tag = pkg.tag;
     apiPkg.weight = pkg.weight;
     return apiPkg;

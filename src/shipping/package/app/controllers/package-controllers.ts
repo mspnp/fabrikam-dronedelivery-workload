@@ -122,7 +122,7 @@ export class PackageControllers {
 
       ctx.response.status = 204;
     }
-    catch (ex) {
+    catch (ex: any) {
      // Need to handle the case were it's 404 vs invalid data
      ctx.throw(400, ex.message);
     }
@@ -175,7 +175,7 @@ export class PackageControllers {
 
       return;
     }
-    catch (ex) {
+    catch (ex: any) {
      switch (ex.code) {
        case MongoErrors.ShardKeyNotFound:
          logger.error('Missing shard key', ctx.request.body)

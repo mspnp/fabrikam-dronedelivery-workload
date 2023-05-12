@@ -2,20 +2,20 @@
 
 export class Package
 {
-  id:string
-  size:string
-  weight:number
-  tag:string
+  id:string = '';
+  size:string = '';
+  weight:number = 0;
+  tag:string = '';
 }
 
 export class PackageUtilization
 {
-  totalWeight:number
+  totalWeight:number = 0;
 }
 
 export class Error
 {
-  code:number
-  message:string
+  code:number = 0;
+  message:string = '';
 }
 

@@ -10,4 +10,4 @@ fi
 
 docker-compose -p drone-package -f ./docker-compose.dev.yaml up -d
 
-docker attach dronepackage_app_1
+docker attach drone-package_app_1
