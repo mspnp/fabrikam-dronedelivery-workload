@@ -67,7 +67,7 @@ resource la 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 
 @description('The Azure Container Registry expected to hold all of the workload images.')
 resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: 'acr-${commonUniqueString}'
+  name: 'acr${commonUniqueString}'
   sku: {
     name: 'Premium'
   }
@@ -342,7 +342,15 @@ resource dsCosmosDbDelivery 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
     workspaceId: la.id
     logs: [
       {
-        categoryGroup: 'allLogs'
+        category: 'DataPlaneRequests'
+        enabled: true
+      }
+      {
+        category: 'ControlPlateRequests'
+        enabled: true
+      }
+      {
+        category: 'QueryRuntimeStatistics'
         enabled: true
       }
     ]
@@ -506,7 +514,15 @@ resource dsCosmosDbDroneScheduler 'Microsoft.Insights/diagnosticSettings@2021-05
     workspaceId: la.id
     logs: [
       {
-        categoryGroup: 'allLogs'
+        category: 'DataPlaneRequests'
+        enabled: true
+      }
+      {
+        category: 'ControlPlateRequests'
+        enabled: true
+      }
+      {
+        category: 'QueryRuntimeStatistics'
         enabled: true
       }
     ]
@@ -864,7 +880,19 @@ resource dsMongoDbPackage 'Microsoft.Insights/diagnosticSettings@2021-05-01-prev
     workspaceId: la.id
     logs: [
       {
-        categoryGroup: 'allLogs'
+        category: 'DataPlaneRequests'
+        enabled: true
+      }
+      {
+        category: 'MongoRequests'
+        enabled: true
+      }
+      {
+        category: 'ControlPlateRequests'
+        enabled: true
+      }
+      {
+        category: 'QueryRuntimeStatistics'
         enabled: true
       }
     ]
