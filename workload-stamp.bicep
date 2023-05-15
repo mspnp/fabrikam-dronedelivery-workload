@@ -4,33 +4,7 @@ targetScope = 'resourceGroup'
 
 @description('The default location for all resources.')
 @minLength(1)
-param location string = 'eastus2'
-
-@description('For Azure resources that support native geo-redundancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://learn.microsoft.com/azure/best-practices-availability-paired-regions. This region does not need to support availability zones.')
-@allowed([
-  'australiasoutheast'
-  'canadaeast'
-  'eastus2'
-  'westus'
-  'centralus'
-  'westcentralus'
-  'francesouth'
-  'germanynorth'
-  'westeurope'
-  'ukwest'
-  'northeurope'
-  'japanwest'
-  'southafricawest'
-  'northcentralus'
-  'eastasia'
-  'eastus'
-  'westus2'
-  'francecentral'
-  'uksouth'
-  'japaneast'
-  'southeastasia'
-])
-param geoRedundancyLocation string = 'centralus'
+param location string = resourceGroup().location
 
 /*** VARIABLES ***/
 
@@ -38,6 +12,7 @@ var commonUniqueString = uniqueString('fabrikam', resourceGroup().id)
 
 /*** EXISTING RESOURCES ***/
 
+@description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
 resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
   scope: subscription()
@@ -92,11 +67,6 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
       }
     }
   }
-
-  resource replication 'replications' = {
-    name: geoRedundancyLocation
-    location: geoRedundancyLocation
-  }
 }
 
 @description('Azure Container Registry diagnostics settings.')
@@ -136,7 +106,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 
 @description('Managed identity for the Workflow service.')
 resource miWorkflow 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'uid-workflow'
+  name: 'mi-workflow'
   location: location
   tags: {
     displayName: 'Workflow service managed identity'
@@ -148,7 +118,7 @@ resource miWorkflow 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31
 
 @description('Key Vault instance used by the Workflow service.')
 resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  name: 'wf-${commonUniqueString}'
+  name: 'kv-wf-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'Workflow Key Vault'
@@ -172,6 +142,7 @@ resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
       virtualNetworkRules: []
     }
     accessPolicies: [
+      // TODO: Convert to RBAC
       {
         tenantId: subscription().tenantId
         objectId: miWorkflow.properties.principalId
@@ -254,7 +225,7 @@ resource rsWorkflowToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-0
 
 @description('Managed identity for the Delivery service.')
 resource miDelivery 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'uid-delivery'
+  name: 'mi-delivery'
   location: location
   tags: {
     displayName: 'Delivery service managed identity'
@@ -266,7 +237,7 @@ resource miDelivery 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31
 
 @description('Redis Cache instance for the Delivery service')
 resource redisDelivery 'Microsoft.Cache/redis@2022-06-01' = {
-  name: 'dr-${commonUniqueString}'
+  name: 'redis-d-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'Redis Cache for inflight deliveries'
@@ -303,7 +274,7 @@ resource dsRedisDelivery 'Microsoft.Insights/diagnosticSettings@2021-05-01-previ
 
 @description('Database for the Delivery service.')
 resource cosmosDbDelivery 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
-  name: 'd-${commonUniqueString}'
+  name: 'cosmos-d-${commonUniqueString}'
   location: location
   kind: 'GlobalDocumentDB'
   tags: {
@@ -313,6 +284,9 @@ resource cosmosDbDelivery 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   properties: {
     createMode: 'Default'
     databaseAccountOfferType: 'Standard'
+    consistencyPolicy: {
+      defaultConsistencyLevel: 'Session'
+    }
     disableLocalAuth: false
     enableCassandraConnector: false
     enableFreeTier: false
@@ -325,10 +299,6 @@ resource cosmosDbDelivery 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
       {
         locationName: location
         failoverPriority: 0
-      }
-      {
-        locationName: geoRedundancyLocation
-        failoverPriority: 1
       }
     ]
   }
@@ -346,7 +316,7 @@ resource dsCosmosDbDelivery 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
         enabled: true
       }
       {
-        category: 'ControlPlateRequests'
+        category: 'ControlPlaneRequests'
         enabled: true
       }
       {
@@ -359,7 +329,7 @@ resource dsCosmosDbDelivery 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
 
 @description('Key Vault instance used by the Delivery service.')
 resource kvDelivery 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: 'dkv-${commonUniqueString}'
+  name: 'kv-d-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'Delivery Key Vault'
@@ -463,7 +433,7 @@ resource rsDeliveryToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-0
 
 @description('Managed identity for the Scheduler service.')
 resource miDroneScheduler 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'uid-dronescheduler'
+  name: 'mi-dronescheduler'
   location: location
   tags: {
     displayName: 'Scheduler service managed identity'
@@ -475,7 +445,7 @@ resource miDroneScheduler 'Microsoft.ManagedIdentity/userAssignedIdentities@2023
 
 @description('Database for the Scheduler service.')
 resource cosmosDbDroneScheduler 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
-  name: 'ds-${commonUniqueString}'
+  name: 'cosmos-ds-${commonUniqueString}'
   location: location
   kind: 'GlobalDocumentDB'
   tags: {
@@ -486,6 +456,9 @@ resource cosmosDbDroneScheduler 'Microsoft.DocumentDB/databaseAccounts@2023-04-1
     createMode: 'Default'
     databaseAccountOfferType: 'Standard'
     disableLocalAuth: false
+    consistencyPolicy: {
+      defaultConsistencyLevel: 'Session'
+    }
     enableCassandraConnector: false
     enableFreeTier: false
     minimalTlsVersion: 'Tls12'
@@ -497,10 +470,6 @@ resource cosmosDbDroneScheduler 'Microsoft.DocumentDB/databaseAccounts@2023-04-1
       {
         locationName: location
         failoverPriority: 0
-      }
-      {
-        locationName: geoRedundancyLocation
-        failoverPriority: 1
       }
     ]
   }
@@ -518,7 +487,7 @@ resource dsCosmosDbDroneScheduler 'Microsoft.Insights/diagnosticSettings@2021-05
         enabled: true
       }
       {
-        category: 'ControlPlateRequests'
+        category: 'ControlPlaneRequests'
         enabled: true
       }
       {
@@ -531,7 +500,7 @@ resource dsCosmosDbDroneScheduler 'Microsoft.Insights/diagnosticSettings@2021-05
 
 @description('Key Vault instance used by the Scheduler service.')
 resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: 'ds-${commonUniqueString}'
+  name: 'kv-ds-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'DroneScheduler Key Vault'
@@ -555,6 +524,7 @@ resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
       virtualNetworkRules: []
     }
     accessPolicies: [
+      // TODO: Convert to RBAC
       {
         tenantId: subscription().tenantId
         objectId: miDroneScheduler.properties.principalId
@@ -669,7 +639,7 @@ resource rsSchedulerToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-
 
 @description('Managed identity for the Ingestion service.')
 resource miIngestion 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'uid-ingestion'
+  name: 'mi-ingestion'
   location: location
   tags: {
     displayName: 'Ingestion service managed identity'
@@ -681,7 +651,7 @@ resource miIngestion 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-3
 
 @description('Service Bus Namespace for the Ingestion service')
 resource sbnIngestion 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
-  name: 'i-${commonUniqueString}'
+  name: 'sbns-i-${commonUniqueString}'
   location: location
   sku: {
     name: 'Premium'
@@ -702,7 +672,7 @@ resource sbnIngestion 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
 
   // The queue shared between the ingestion service (send) and the workflow service (listen)
   resource ingestionQueue 'queues' = {
-    name: 'i-${commonUniqueString}'
+    name: 'sbq-i-${commonUniqueString}'
     properties: {
       lockDuration: 'PT5M'
       maxSizeInMegabytes: 1024
@@ -747,7 +717,7 @@ resource dsSbnIngestion 'Microsoft.Insights/diagnosticSettings@2021-05-01-previe
 
 @description('Key Vault instance used by the Ingestion service.')
 resource kvIngestion 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: 'ingkv-${commonUniqueString}'
+  name: 'kv-i-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'Package Key Vault'
@@ -771,6 +741,7 @@ resource kvIngestion 'Microsoft.KeyVault/vaults@2023-02-01' = {
       virtualNetworkRules: []
     }
     accessPolicies: [
+      // TODO: Convert to RBAC
       {
         tenantId: subscription().tenantId
         objectId: miIngestion.properties.principalId
@@ -829,7 +800,7 @@ resource rsIngestionKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01
 
 @description('Managed identity for the Package service.')
 resource miPackage 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'uid-package'
+  name: 'mi-package'
   location: location
   tags: {
     displayName: 'Package service managed identity'
@@ -841,7 +812,7 @@ resource miPackage 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31'
 
 @description('Database for the Package service.')
 resource mongoDbPackage 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
-  name: 'p-${commonUniqueString}'
+  name: 'cosmon-p-${commonUniqueString}'
   kind: 'MongoDB'
   location: location
   tags: {
@@ -864,10 +835,6 @@ resource mongoDbPackage 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
         locationName: location
         failoverPriority: 0
       }
-      {
-        locationName: geoRedundancyLocation
-        failoverPriority: 1
-      }
     ]
   }
 }
@@ -888,7 +855,7 @@ resource dsMongoDbPackage 'Microsoft.Insights/diagnosticSettings@2021-05-01-prev
         enabled: true
       }
       {
-        category: 'ControlPlateRequests'
+        category: 'ControlPlaneRequests'
         enabled: true
       }
       {
@@ -901,7 +868,7 @@ resource dsMongoDbPackage 'Microsoft.Insights/diagnosticSettings@2021-05-01-prev
 
 @description('Key Vault instance used by the Package service.')
 resource kvPackage 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: 'pkkv-${commonUniqueString}'
+  name: 'kv-p-${commonUniqueString}'
   location: location
   tags: {
     displayName: 'Package Key Vault'
@@ -925,6 +892,7 @@ resource kvPackage 'Microsoft.KeyVault/vaults@2023-02-01' = {
       virtualNetworkRules: []
     }
     accessPolicies: [
+      // TODO: Convert to RBAC
       {
         tenantId: subscription().tenantId
         objectId: miPackage.properties.principalId
@@ -979,6 +947,7 @@ output acrId string = acr.id
 output acrName string = acr.name
 output deliveryKeyVaultUri string = kvDelivery.properties.vaultUri
 output droneSchedulerKeyVaultUri string = kvDroneScheduler.properties.vaultUri
+output deliveryRedisName string = redisDelivery.name
 output deliveryCosmosDbName string = cosmosDbDelivery.name
 output droneSchedulerCosmosDbName string = cosmosDbDroneScheduler.name
 output packageMongoDbName string = mongoDbPackage.name
@@ -986,6 +955,7 @@ output ingestionQueueNamespace string = sbnIngestion.name
 output ingestionQueueName string = sbnIngestion::ingestionQueue.name
 output ingestionServiceAccessKeyName string = sbnIngestion::ingestionAccessKey.name
 output workflowKeyVaultName string = kvWorkflow.name
+output workflowServiceAccessKeyName string = sbnIngestion::workflowAccessKey.name
 output deliveryKeyVaultName string = kvDelivery.name
 output droneSchedulerKeyVaultName string = kvDroneScheduler.name
 output ingestionKeyVaultName string = kvIngestion.name

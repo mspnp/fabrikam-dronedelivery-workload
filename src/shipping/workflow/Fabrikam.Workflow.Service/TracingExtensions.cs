@@ -89,17 +89,6 @@ namespace Fabrikam.Workflow.Service
             return services;
         }
 
-        public static IServiceCollection AddApplicationInsightsKubernetesEnricher (this IServiceCollection services)
-        {
-            services.Configure<TelemetryConfiguration>(
-                (config) =>
-                    config.AddApplicationInsightsKubernetesEnricher(
-                            applyOptions: null)
-            );
-
-            return services;
-        }
-
         private class TelemetryConfigurationOptionsSetup : IConfigureOptions<TelemetryConfiguration>
         {
             private const string CustomKeyVaultAppInsightsIKey = "ApplicationInsights-InstrumentationKey";
