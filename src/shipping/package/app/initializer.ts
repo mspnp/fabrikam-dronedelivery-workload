@@ -26,7 +26,7 @@ export class PackageServiceInitializer
             var db = (await MongoClient.connect(connection)).db();
             await db.command({ shardCollection: db.databaseName + '.' + collectionName, key: { tag: "hashed" } });
         }
-        catch (ex) {
+        catch (ex: any) {
             if (ex.code != MongoErrors.CommandNotFound && ex.code != 9) {
                 console.log(ex);
             }

@@ -1,16 +1,17 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 19",
+  "_version": "2.0.0",
+
   "compilerOptions": {
     "outDir": ".bin",
-    "module": "commonjs",
-    "target": "es2017",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true
-  },
-  "exclude": [
-    "node_modules"
-  ],
-  "typeRoots": ["node_modules/@types"],
-  "types": [".*"]
+    "module": "Node16",
+    "target": "es2022",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+  }
 }

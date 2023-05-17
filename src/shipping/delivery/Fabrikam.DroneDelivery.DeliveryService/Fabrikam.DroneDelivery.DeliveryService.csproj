@@ -13,7 +13,7 @@
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.18.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.Kubernetes" Version="2.0.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Kubernetes" Version="2.0.6" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.15.0" />
     <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.3.2" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.1" />

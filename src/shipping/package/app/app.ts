@@ -26,7 +26,7 @@ export class KoaApp {
     app.use(async (ctx : any, next : any) => {
       try {
         await next();
-      } catch (ex) {
+      } catch (ex: any) {
 
         var logger : ILogger = ctx.state.logger;
         if (logger) {
