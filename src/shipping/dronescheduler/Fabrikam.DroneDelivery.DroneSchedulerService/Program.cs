@@ -3,8 +3,6 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-using System;
-using Azure.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +35,7 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService
 
                             if (buildConfig["KEY_VAULT_URI"] is var keyVaultUri && !string.IsNullOrEmpty(keyVaultUri))
                             {
-                                configurationBuilder.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+                                configurationBuilder.AddAzureKeyVault(keyVaultUri);
                             }
                         })
                         .ConfigureLogging((hostingContext, loggingBuilder) =>
