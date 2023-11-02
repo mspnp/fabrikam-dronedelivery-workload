@@ -6,7 +6,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -17,6 +16,8 @@ using Fabrikam.DroneDelivery.DeliveryService.Services;
 using Fabrikam.DroneDelivery.DeliveryService.Middlewares.Builder;
 using Serilog;
 using Serilog.Formatting.Compact;
+using System;
+using Azure.Identity;
 
 namespace Fabrikam.DroneDelivery.DeliveryService
 {
@@ -36,7 +37,7 @@ namespace Fabrikam.DroneDelivery.DeliveryService
 
             if (buildConfig["KEY_VAULT_URI"] is var keyVaultUri && !string.IsNullOrEmpty(keyVaultUri))
             {
-                builder.AddAzureKeyVault(keyVaultUri);
+                builder.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
             }
 
             Configuration = builder.Build();
