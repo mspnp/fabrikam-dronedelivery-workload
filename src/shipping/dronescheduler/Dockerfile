@@ -1,10 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 as base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 as base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-
-MAINTAINER Fernando Antivero (https://github.com/ferantivero)
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 WORKDIR /app
 COPY delivery/Fabrikam.DroneDelivery.Common/*.csproj ./delivery/Fabrikam.DroneDelivery.Common/
@@ -19,8 +17,6 @@ COPY dronescheduler/Fabrikam.DroneDelivery.DroneSchedulerService/. ./droneschedu
 
 FROM build AS publish
 
-MAINTAINER Fernando Antivero (https://github.com/ferantivero)
-
 RUN find -type d -name bin -prune -exec rm -rf {} \; && find -type d -name obj -prune -exec rm -rf {} \;
 
 WORKDIR /app
@@ -28,24 +24,10 @@ RUN dotnet publish /app/dronescheduler/Fabrikam.DroneDelivery.DroneSchedulerServ
 
 FROM base AS runtime
 
-MAINTAINER Fernando Antivero (https://github.com/ferantivero)
-
 LABEL Tags="Azure,AKS,DroneDelivery"
-
-ARG user=deliveryuser
-
-RUN useradd -m -s /bin/bash -U $user
 
 WORKDIR /app
 COPY --from=publish /app/out ./
-COPY dronescheduler/scripts/. ./
-RUN \
-    # Ensures the entry point is executable
-    chmod ugo+x /app/run.sh
+RUN ls -la
+ENTRYPOINT ["dotnet", "Fabrikam.DroneDelivery.DroneSchedulerService.dll"]
 
-RUN chown -R $user.$user /app
-
-# Set it for subsequent commands
-USER $user
-
-ENTRYPOINT ["/bin/bash", "/app/run.sh"]
