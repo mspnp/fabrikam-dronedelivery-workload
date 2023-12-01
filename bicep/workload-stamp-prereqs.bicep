@@ -11,7 +11,7 @@ resource rg_shipping_dronedelivery 'Microsoft.Resources/resourceGroups@2022-09-0
 }
 
 resource rg_shipping_dronedelivery_acr 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'far1rg-shipping-dronedelivery-acr'
+  name: 'rg-shipping-dronedelivery-acr'
   location: resourceGroupLocation
   tags: {
     displayName: 'Container Registry Resource Group'
