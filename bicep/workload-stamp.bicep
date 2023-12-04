@@ -48,11 +48,16 @@ var ingestionSBName = 'i-${uniqueString(resourceGroup().id)}'
 var ingestionServiceAccessKeyName = 'IngestionServiceAccessKey'
 var ingestionKeyVaultName = 'ingkv-${uniqueString(resourceGroup().id)}'
 var droneSchedulerKeyVaultName = 'ds-${uniqueString(resourceGroup().id)}'
-var readerRole = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7'
 var workflowKeyVaultName = 'wf-${uniqueString(resourceGroup().id)}'
 var workflowServiceAccessKeyName = 'WorkflowServiceAccessKey'
 var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
+
+@description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
+resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+  scope: subscription()
+}
 
 module containerRegistry './nested_workload-stamp.bicep' = {
   name: nestedACRDeploymentName
@@ -550,50 +555,50 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource deliveryKeyVaultName_Microsoft_Authorization_deliveryIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${deliveryKeyVaultName}${resourceGroup().id}', readerRole)
+  name:  guid('${deliveryKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: deliveryKeyVault
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: builtInReaderRole.id
     principalId: deliveryPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
 
 resource workflowKeyVaultName_Microsoft_Authorization_workflowIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01'= {
-  name: guid('${workflowKeyVaultName}${resourceGroup().id}', readerRole)
+  name: guid('${workflowKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: workflowKeyVault
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: builtInReaderRole.id
     principalId: workflowPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
 
 resource droneSchedulerKeyVaultName_Microsoft_Authorization_droneSchedulerIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${droneSchedulerKeyVaultName}${resourceGroup().id}', readerRole)
+  name: guid('${droneSchedulerKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: droneSchedulerKeyVault
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: builtInReaderRole.id
     principalId: droneSchedulerPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
 
 resource ingestionKeyVaultName_Microsoft_Authorization_ingestionIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${ingestionKeyVaultName}${resourceGroup().id}', readerRole)
+  name: guid('${ingestionKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: ingestionKeyVault
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: builtInReaderRole.id
     principalId: ingestionPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
 
 resource packageKeyVaultName_Microsoft_Authorization_packageIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${packageKeyVaultName}${resourceGroup().id}', readerRole)
+  name: guid('${packageKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: packageKeyVault
   properties: {
-    roleDefinitionId: readerRole
+    roleDefinitionId: builtInReaderRole.id
     principalId: packagePrincipalId
     principalType: 'ServicePrincipal'
   }
