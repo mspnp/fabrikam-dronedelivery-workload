@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
-using Azure.Identity;
 
 namespace Fabrikam.DroneDelivery.DroneSchedulerService
 {
