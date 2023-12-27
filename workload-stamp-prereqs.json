@@ -50,7 +50,7 @@
                             "tags": {
                                 "displayName": "workflow managed identity",
                                 "what": "rbac",
-                                "reason": "aad-pod-identity",
+                                "reason": "workload-identity",
                                 "app": "fabrikam-workflow"
                             }
                         },
@@ -62,7 +62,7 @@
                             "tags": {
                                 "displayName": "delivery managed identity",
                                 "what": "rbac",
-                                "reason": "aad-pod-identity",
+                                "reason": "workload-identity",
                                 "app": "fabrikam-delivery"
                             }
                         },
@@ -74,7 +74,7 @@
                             "tags": {
                                 "displayName": "dronescheduler managed identity",
                                 "what": "rbac",
-                                "reason": "aad-pod-identity",
+                                "reason": "workload-identity",
                                 "app": "fabrikam-dronescheduler"
                             }
                         },
@@ -86,7 +86,7 @@
                             "tags": {
                                 "displayName": "ingestion managed identity",
                                 "what": "rbac",
-                                "reason": "aad-pod-identity",
+                                "reason": "workload-identity",
                                 "app": "fabrikam-ingestion"
                             }
                         },
@@ -98,7 +98,7 @@
                             "tags": {
                                 "displayName": "package managed identity",
                                 "what": "rbac",
-                                "reason": "aad-pod-identity",
+                                "reason": "workload-identity",
                                 "app": "fabrikam-package"
                             }
                         }
