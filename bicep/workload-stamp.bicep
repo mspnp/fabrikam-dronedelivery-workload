@@ -51,6 +51,7 @@ var droneSchedulerKeyVaultName = 'ds-${uniqueString(resourceGroup().id)}'
 var workflowKeyVaultName = 'wf-${uniqueString(resourceGroup().id)}'
 var workflowServiceAccessKeyName = 'WorkflowServiceAccessKey'
 var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
+var logAnaliticWorkpaceName = 'law-${uniqueString(resourceGroup().id)}'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 
 @description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
@@ -542,6 +543,18 @@ resource workflowKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.
   }
 }
 
+resource LogAnaliticWorkpace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+  name: logAnaliticWorkpaceName
+  location: location
+  properties: {
+    sku: {
+      name: 'pergb2018'
+    }
+    publicNetworkAccessForIngestion:'Enabled'
+    publicNetworkAccessForQuery:'Enabled'
+  }
+}
+
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   kind: 'other'
@@ -551,6 +564,10 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
   properties: {
     Application_Type: 'other'
+    WorkspaceResourceId: LogAnaliticWorkpace.id
+    IngestionMode:'LogAnalytics'
+    publicNetworkAccessForIngestion:'Enabled'
+    publicNetworkAccessForQuery:'Enabled'
   }
 }
 
