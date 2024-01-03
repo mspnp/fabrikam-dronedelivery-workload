@@ -26,8 +26,19 @@ FROM base AS runtime
 
 LABEL Tags="Azure,AKS,DroneDelivery"
 
+ARG user=deliveryuser
+
+RUN useradd -m -s /bin/bash -U $user
+
 WORKDIR /app
 COPY --from=publish /app/out ./
-RUN ls -la
-ENTRYPOINT ["dotnet", "Fabrikam.DroneDelivery.DroneSchedulerService.dll"]
+COPY dronescheduler/scripts/. ./
+RUN \
+    # Ensures the entry point is executable
+    chmod ugo+x /app/run.sh
 
+RUN chown -R $user:$user /app
+
+# Set it for subsequent commands
+USER $user
+ENTRYPOINT ["/bin/bash", "/app/run.sh"]
