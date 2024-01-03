@@ -3,20 +3,21 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using Azure.Identity;
+using Fabrikam.DroneDelivery.DeliveryService.Middlewares.Builder;
+using Fabrikam.DroneDelivery.DeliveryService.Models;
+using Fabrikam.DroneDelivery.DeliveryService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Fabrikam.DroneDelivery.DeliveryService.Models;
-using Fabrikam.DroneDelivery.DeliveryService.Services;
-using Fabrikam.DroneDelivery.DeliveryService.Middlewares.Builder;
 using Serilog;
 using Serilog.Formatting.Compact;
+using System;
 
 namespace Fabrikam.DroneDelivery.DeliveryService
 {
@@ -36,7 +37,7 @@ namespace Fabrikam.DroneDelivery.DeliveryService
 
             if (buildConfig["KEY_VAULT_URI"] is var keyVaultUri && !string.IsNullOrEmpty(keyVaultUri))
             {
-                builder.AddAzureKeyVault(keyVaultUri);
+                builder.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
             }
 
             Configuration = builder.Build();
