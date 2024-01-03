@@ -26,6 +26,7 @@ WORKDIR /app/tests
 COPY Fabrikam.DroneDelivery.DeliveryService.Tests/. .
 ENTRYPOINT ["dotnet", "test", "--logger:trx"]
 
+
 FROM build AS publish
 
 RUN find -type d -name bin -prune -exec rm -rf {} \; && find -type d -name obj -prune -exec rm -rf {} \;
@@ -34,9 +35,22 @@ WORKDIR /app
 RUN dotnet publish /app/Fabrikam.DroneDelivery.DeliveryService/ -c release -o ./out 
 
 FROM base AS runtime
-
 LABEL Tags="Azure,AKS,DroneDelivery"
+
+ARG user=deliveryuser
+
+RUN useradd -m -s /bin/bash -U $user
 
 WORKDIR /app
 COPY --from=publish /app/out ./
-ENTRYPOINT ["dotnet", "Fabrikam.DroneDelivery.DeliveryService.dll"]
+COPY scripts/. ./
+RUN \
+    # Ensures the entry point is executable
+    chmod ugo+x /app/run.sh
+
+RUN chown -R $user:$user /app
+
+# Set it for subsequent commands
+USER $user
+
+ENTRYPOINT ["/bin/bash", "/app/run.sh"]
