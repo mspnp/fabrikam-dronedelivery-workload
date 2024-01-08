@@ -61,7 +61,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   }
 }
 
-resource variables_acrName_geoRedundancyLocation 'Microsoft.ContainerRegistry/registries/replications@2023-01-01-preview' = {
+resource acrGeoRedundancyLocation 'Microsoft.ContainerRegistry/registries/replications@2023-01-01-preview' = {
   parent: acr
   name: geoRedundancyLocation
   location: geoRedundancyLocation

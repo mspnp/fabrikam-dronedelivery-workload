@@ -1,3 +1,4 @@
+@description('Azure Container Registry resource group location.')
 param resourceGroupLocation string
 
 resource workflowManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {

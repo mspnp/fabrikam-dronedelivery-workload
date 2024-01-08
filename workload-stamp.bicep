@@ -1,3 +1,4 @@
+@description('The location to deploy the workload stamp to.')
 param location string = resourceGroup().location
 
 @description('For Azure resources that support native geo-redundancy, provide the location the redundant service will have its secondary. Should be different than the location parameter and ideally should be a paired region - https://learn.microsoft.com/azure/best-practices-availability-paired-regions. This region does not need to support availability zones.')
@@ -32,27 +33,27 @@ param ingestionPrincipalId string
 param packagePrincipalId string
 
 var acrName = uniqueString('acr-', subscription().subscriptionId, resourceGroup().id)
+var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
+var logAnaliticWorkpaceName = 'law-${uniqueString(resourceGroup().id)}'
+var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 var deliveryRedisCacheSKU = 'Basic'
 var deliveryRedisCacheFamily = 'C'
 var deliveryRedisCacheCapacity = 0
 var deliveryCosmosDbName = 'd-${uniqueString(resourceGroup().id)}'
-var packageMongoDbName = 'p-${uniqueString(resourceGroup().id)}'
-var droneSchedulerCosmosDbName = 'ds-${uniqueString(resourceGroup().id)}'
 var deliveryRedisName = 'dr-${uniqueString(resourceGroup().id)}'
 var deliveryKeyVaultName = 'dkv-${uniqueString(resourceGroup().id)}'
-var keyVaultPackageName = 'pkkv-${uniqueString(resourceGroup().id)}'
+var droneSchedulerCosmosDbName = 'ds-${uniqueString(resourceGroup().id)}'
+var droneSchedulerKeyVaultName = 'ds-${uniqueString(resourceGroup().id)}'
+var packageKeyVaultName = 'pkkv-${uniqueString(resourceGroup().id)}'
+var packageMongoDbName = 'p-${uniqueString(resourceGroup().id)}'
 var ingestionSBNamespaceName = 'i-${uniqueString(resourceGroup().id)}'
 var ingestionSBNamespaceSKU = 'Premium'
 var ingestionSBNamespaceTier = 'Premium'
 var ingestionSBName = 'i-${uniqueString(resourceGroup().id)}'
 var ingestionServiceAccessKeyName = 'IngestionServiceAccessKey'
 var ingestionKeyVaultName = 'ingkv-${uniqueString(resourceGroup().id)}'
-var droneSchedulerKeyVaultName = 'ds-${uniqueString(resourceGroup().id)}'
 var workflowKeyVaultName = 'wf-${uniqueString(resourceGroup().id)}'
 var workflowServiceAccessKeyName = 'WorkflowServiceAccessKey'
-var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
-var logAnaliticWorkpaceName = 'law-${uniqueString(resourceGroup().id)}'
-var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 
 @description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
 resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
@@ -168,7 +169,7 @@ resource ingestionSBNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-previe
   }
 }
 
-resource ingestionSBNamespace_ingestionSB 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
+resource ingestionSBNamespaceIngestionSB 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
   parent: ingestionSBNamespace
   name: ingestionSBName
   properties: {
@@ -177,7 +178,7 @@ resource ingestionSBNamespace_ingestionSB 'Microsoft.ServiceBus/namespaces/queue
   }
 }
 
-resource ingestionSBNamespace_ingestionServiceAccessKey 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
+resource ingestionSBNamespaceIngestionServiceAccessKey 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
   parent: ingestionSBNamespace
   name: ingestionServiceAccessKeyName
   properties: {
@@ -187,7 +188,7 @@ resource ingestionSBNamespace_ingestionServiceAccessKey 'Microsoft.ServiceBus/na
   }
 }
 
-resource ingestionSBNamespace_workflowServiceAccessKey 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
+resource ingestionSBNamespaceWorkflowServiceAccessKey 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2022-10-01-preview' = {
   parent: ingestionSBNamespace
   name: workflowServiceAccessKeyName
   properties: {
@@ -231,7 +232,7 @@ resource deliveryKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource deliveryKeyVaultName_CosmosDB_Endpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource deliveryKeyVaultCosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: deliveryKeyVault
   name: 'CosmosDB-Endpoint'
   properties: {
@@ -239,7 +240,7 @@ resource deliveryKeyVaultName_CosmosDB_Endpoint 'Microsoft.KeyVault/vaults/secre
   }
 }
 
-resource deliveryKeyVaultName_CosmosDB_Key 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource deliveryKeyVaultCosmosDBKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: deliveryKeyVault
   name: 'CosmosDB-Key'
   properties: {
@@ -247,7 +248,7 @@ resource deliveryKeyVaultName_CosmosDB_Key 'Microsoft.KeyVault/vaults/secrets@20
   }
 }
 
-resource deliveryKeyVaultName_Redis_Endpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource deliveryKeyVaultRedisEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: deliveryKeyVault
   name: 'Redis-Endpoint'
   properties: {
@@ -255,7 +256,7 @@ resource deliveryKeyVaultName_Redis_Endpoint 'Microsoft.KeyVault/vaults/secrets@
   }
 }
 
-resource deliveryKeyVaultName_Redis_AccessKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource deliveryKeyVaultRedisAccessKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: deliveryKeyVault
   name: 'Redis-AccessKey'
   properties: {
@@ -263,7 +264,7 @@ resource deliveryKeyVaultName_Redis_AccessKey 'Microsoft.KeyVault/vaults/secrets
   }
 }
 
-resource deliveryKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource deliveryKeyVaultApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: deliveryKeyVault
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
@@ -271,8 +272,8 @@ resource deliveryKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.
   }
 }
 
-resource keyVaultPackage 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: keyVaultPackageName
+resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+  name: packageKeyVaultName
   location: location
   tags: {
     displayName: 'Package Key Vault'
@@ -305,8 +306,8 @@ resource keyVaultPackage 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource keyVaultPackageName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: keyVaultPackage 
+resource packageKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  parent: packageKeyVault 
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
     value: reference(appInsights.id, '2015-05-01').InstrumentationKey
@@ -347,7 +348,7 @@ resource ingestionKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource ingestionKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource ingestionKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: ingestionKeyVault
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
@@ -355,11 +356,11 @@ resource ingestionKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft
   }
 }
 
-resource ingestionKeyVaultName_Queue_Key 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource ingestionKeyVaultNameQueueKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: ingestionKeyVault
   name: 'Queue--Key'
   properties: {
-    value: listKeys(ingestionSBNamespace_ingestionServiceAccessKey.id, '2017-04-01').primaryKey
+    value: listKeys(ingestionSBNamespaceIngestionServiceAccessKey.id, '2017-04-01').primaryKey
   }
 }
 
@@ -397,7 +398,7 @@ resource droneSchedulerKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource droneSchedulerKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
@@ -405,7 +406,7 @@ resource droneSchedulerKeyVaultName_ApplicationInsights_InstrumentationKey 'Micr
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBEndpoint'
   properties: {
@@ -413,7 +414,7 @@ resource droneSchedulerKeyVaultName_CosmosDBEndpoint 'Microsoft.KeyVault/vaults/
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBKey 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBKey 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBKey'
   properties: {
@@ -421,7 +422,7 @@ resource droneSchedulerKeyVaultName_CosmosDBKey 'Microsoft.KeyVault/vaults/secre
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBConnectionMode 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBConnectionMode 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBConnectionMode'
   properties: {
@@ -429,7 +430,7 @@ resource droneSchedulerKeyVaultName_CosmosDBConnectionMode 'Microsoft.KeyVault/v
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBConnectionProtocol 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBConnectionProtocol 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBConnectionProtocol'
   properties: {
@@ -437,7 +438,7 @@ resource droneSchedulerKeyVaultName_CosmosDBConnectionProtocol 'Microsoft.KeyVau
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBMaxConnectionsLimit 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBMaxConnectionsLimit 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBMaxConnectionsLimit'
   properties: {
@@ -445,7 +446,7 @@ resource droneSchedulerKeyVaultName_CosmosDBMaxConnectionsLimit 'Microsoft.KeyVa
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBMaxParallelism 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBMaxParallelism 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBMaxParallelism'
   properties: {
@@ -453,7 +454,7 @@ resource droneSchedulerKeyVaultName_CosmosDBMaxParallelism 'Microsoft.KeyVault/v
   }
 }
 
-resource droneSchedulerKeyVaultName_CosmosDBMaxBufferedItemCount 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameCosmosDBMaxBufferedItemCount 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'CosmosDBMaxBufferedItemCount'
   properties: {
@@ -461,7 +462,7 @@ resource droneSchedulerKeyVaultName_CosmosDBMaxBufferedItemCount 'Microsoft.KeyV
   }
 }
 
-resource droneSchedulerKeyVaultName_FeatureManagement_UsePartitionKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource droneSchedulerKeyVaultNameFeatureManagementUsePartitionKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: droneSchedulerKeyVault
   name: 'FeatureManagement--UsePartitionKey'
   properties: {
@@ -503,7 +504,7 @@ resource workflowKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource workflowKeyVaultName_Queue 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource workflowKeyVaultNameQueue 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: workflowKeyVault
   name: 'QueueName'
   properties: {
@@ -511,7 +512,7 @@ resource workflowKeyVaultName_Queue 'Microsoft.KeyVault/vaults/secrets@2022-07-0
   }
 }
 
-resource workflowKeyVaultName_QueueEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource workflowKeyVaultNameQueueEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: workflowKeyVault
   name: 'QueueEndpoint'
   properties: {
@@ -519,7 +520,7 @@ resource workflowKeyVaultName_QueueEndpoint 'Microsoft.KeyVault/vaults/secrets@2
   }
 }
 
-resource workflowKeyVaultName_QueueAccessPolicy 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource workflowKeyVaultNameQueueAccessPolicy 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: workflowKeyVault
   name: 'QueueAccessPolicyName'
   properties: {
@@ -531,11 +532,11 @@ resource workflowKeyVaultName_QueueAccessPolicyKey 'Microsoft.KeyVault/vaults/se
   parent: workflowKeyVault
   name: 'QueueAccessPolicyKey'
   properties: {
-    value: listkeys(ingestionSBNamespace_workflowServiceAccessKey.id, '2017-04-01').primaryKey
+    value: listkeys(ingestionSBNamespaceWorkflowServiceAccessKey.id, '2017-04-01').primaryKey
   }
 }
 
-resource workflowKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource workflowKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: workflowKeyVault
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
@@ -571,7 +572,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource deliveryKeyVaultName_Microsoft_Authorization_deliveryIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource deliveryKeyVaultMicrosoftAuthorizationDeliveryIdNameIdReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid('${deliveryKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: deliveryKeyVault
   properties: {
@@ -581,7 +582,7 @@ resource deliveryKeyVaultName_Microsoft_Authorization_deliveryIdName_id_readerRo
   }
 }
 
-resource workflowKeyVaultName_Microsoft_Authorization_workflowIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01'= {
+resource workflowKeyVaultNameMicrosoftAuthorizationWorkflowIdNameIdReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01'= {
   name: guid('${workflowKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: workflowKeyVault
   properties: {
@@ -591,7 +592,7 @@ resource workflowKeyVaultName_Microsoft_Authorization_workflowIdName_id_readerRo
   }
 }
 
-resource droneSchedulerKeyVaultName_Microsoft_Authorization_droneSchedulerIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource droneSchedulerKeyVaultNameMicrosoftAuthorizationDroneSchedulerIdNameIdReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid('${droneSchedulerKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: droneSchedulerKeyVault
   properties: {
@@ -601,7 +602,7 @@ resource droneSchedulerKeyVaultName_Microsoft_Authorization_droneSchedulerIdName
   }
 }
 
-resource ingestionKeyVaultName_Microsoft_Authorization_ingestionIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource ingestionKeyVaultNameMicrosoftAuthorizationIngestionIdNameIdReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid('${ingestionKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
   scope: ingestionKeyVault
   properties: {
@@ -611,9 +612,9 @@ resource ingestionKeyVaultName_Microsoft_Authorization_ingestionIdName_id_reader
   }
 }
 
-resource keyVaultPackageName_Microsoft_Authorization_packageIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${keyVaultPackageName}${resourceGroup().id}', builtInReaderRole.id)
-  scope: keyVaultPackage
+resource packageKeyVaultNameMicrosoftAuthorizationPackageIdNameIdReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('${packageKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
+  scope: packageKeyVault
   properties: {
     roleDefinitionId: builtInReaderRole.id
     principalId: packagePrincipalId
@@ -635,5 +636,5 @@ output workflowKeyVaultName string = workflowKeyVaultName
 output deliveryKeyVaultName string = deliveryKeyVaultName
 output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
-output keyVaultPackageName string = keyVaultPackageName
+output packageKeyVaultName string = packageKeyVaultName
 output appInsightsName string = appInsightsName

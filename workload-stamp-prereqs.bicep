@@ -2,7 +2,7 @@ targetScope = 'subscription'
 
 param resourceGroupLocation string = 'eastus'
 
-resource rg_shipping_dronedelivery 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+resource resourceGroupShippingDronedelivery 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'rg-shipping-dronedelivery'
   location: resourceGroupLocation
   tags: {
@@ -10,7 +10,7 @@ resource rg_shipping_dronedelivery 'Microsoft.Resources/resourceGroups@2022-09-0
   }
 }
 
-resource rg_shipping_dronedelivery_acr 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+resource resourceGroupShippingDronedeliveryAcr 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'rg-shipping-dronedelivery-acr'
   location: resourceGroupLocation
   tags: {
@@ -18,13 +18,10 @@ resource rg_shipping_dronedelivery_acr 'Microsoft.Resources/resourceGroups@2022-
   }
 }
 
-module workload_stamp_prereqs_dep './nested_workload-stamp-prereqs.bicep' = {
+module workloadStampPrereqsDep './nested_workload-stamp-prereqs.bicep' = {
   name: 'workload-stamp-prereqs-dep'
-  scope: resourceGroup('rg-shipping-dronedelivery')
+  scope: resourceGroupShippingDronedelivery
   params: {
     resourceGroupLocation: resourceGroupLocation
   }
-  dependsOn: [
-    rg_shipping_dronedelivery
-  ]
 }
