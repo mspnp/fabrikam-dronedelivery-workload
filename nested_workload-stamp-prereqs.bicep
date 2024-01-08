@@ -1,6 +1,6 @@
 param resourceGroupLocation string
 
-resource uid_workflow 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource workflowManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-workflow'
   location: resourceGroupLocation
   tags: {
@@ -11,7 +11,7 @@ resource uid_workflow 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-
   }
 }
 
-resource uid_delivery 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource deliveryManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-delivery'
   location: resourceGroupLocation
   tags: {
@@ -22,7 +22,7 @@ resource uid_delivery 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-
   }
 }
 
-resource uid_dronescheduler 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource droneschedulerManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-dronescheduler'
   location: resourceGroupLocation
   tags: {
@@ -33,7 +33,7 @@ resource uid_dronescheduler 'Microsoft.ManagedIdentity/userAssignedIdentities@20
   }
 }
 
-resource uid_ingestion 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource ingestionManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-ingestion'
   location: resourceGroupLocation
   tags: {
@@ -44,7 +44,7 @@ resource uid_ingestion 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01
   }
 }
 
-resource uid_package 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource packageManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-package'
   location: resourceGroupLocation
   tags: {

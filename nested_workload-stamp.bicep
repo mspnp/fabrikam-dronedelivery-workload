@@ -27,6 +27,7 @@ param location string = resourceGroup().location
 ])
 param geoRedundancyLocation string
 
+@description('Azure Container Registry name.')
 param  acrName string
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
