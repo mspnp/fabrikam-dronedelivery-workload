@@ -40,7 +40,7 @@ var packageMongoDbName = 'p-${uniqueString(resourceGroup().id)}'
 var droneSchedulerCosmosDbName = 'ds-${uniqueString(resourceGroup().id)}'
 var deliveryRedisName = 'dr-${uniqueString(resourceGroup().id)}'
 var deliveryKeyVaultName = 'dkv-${uniqueString(resourceGroup().id)}'
-var packageKeyVaultName = 'pkkv-${uniqueString(resourceGroup().id)}'
+var keyVaultPackageName = 'pkkv-${uniqueString(resourceGroup().id)}'
 var ingestionSBNamespaceName = 'i-${uniqueString(resourceGroup().id)}'
 var ingestionSBNamespaceSKU = 'Premium'
 var ingestionSBNamespaceTier = 'Premium'
@@ -271,8 +271,8 @@ resource deliveryKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.
   }
 }
 
-resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: packageKeyVaultName
+resource keyVaultPackage 'Microsoft.KeyVault/vaults@2022-07-01' = {
+  name: keyVaultPackageName
   location: location
   tags: {
     displayName: 'Package Key Vault'
@@ -305,8 +305,8 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   dependsOn: []
 }
 
-resource packageKeyVaultName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: packageKeyVault
+resource keyVaultPackageName_ApplicationInsights_InstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  parent: keyVaultPackage 
   name: 'ApplicationInsights--InstrumentationKey'
   properties: {
     value: reference(appInsights.id, '2015-05-01').InstrumentationKey
@@ -611,9 +611,9 @@ resource ingestionKeyVaultName_Microsoft_Authorization_ingestionIdName_id_reader
   }
 }
 
-resource packageKeyVaultName_Microsoft_Authorization_packageIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid('${packageKeyVaultName}${resourceGroup().id}', builtInReaderRole.id)
-  scope: packageKeyVault
+resource keyVaultPackageName_Microsoft_Authorization_packageIdName_id_readerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('${keyVaultPackageName}${resourceGroup().id}', builtInReaderRole.id)
+  scope: keyVaultPackage
   properties: {
     roleDefinitionId: builtInReaderRole.id
     principalId: packagePrincipalId
@@ -635,5 +635,5 @@ output workflowKeyVaultName string = workflowKeyVaultName
 output deliveryKeyVaultName string = deliveryKeyVaultName
 output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
-output packageKeyVaultName string = packageKeyVaultName
+output keyVaultPackageName string = keyVaultPackageName
 output appInsightsName string = appInsightsName
