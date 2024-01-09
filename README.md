@@ -29,7 +29,7 @@ az login
 ### Deploy the workload's prerequisites
 
 ```bash
-az deployment sub create --name workload-stamp-prereqs --location eastus --template-file workload-stamp-prereqs.json
+az deployment sub create --name workload-stamp-prereqs --location eastus --template-file ./workload-stamp-prereqs.bicep
 ```
 
 :book: This pre-flight ARM template is creating a general purpose resource group  as well as one dedicated for the Azure Container Registry. Additionally five User Identites are provisioned as part of this too that will be later associated to every containerized microservice. This is because they will need Azure RBAC roles over the Azure KeyVault to read secrets in runtime.
@@ -47,7 +47,7 @@ INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid
 ### Deploy the workload
 
 ```bash
-az deployment group create -f workload-stamp.json -g rg-shipping-dronedelivery -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
+az deployment group create -f ./workload-stamp.bicep -g rg-shipping-dronedelivery -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
 -p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
 -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
 -p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
