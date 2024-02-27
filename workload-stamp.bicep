@@ -54,6 +54,7 @@ var ingestionServiceAccessKeyName = 'IngestionServiceAccessKey'
 var ingestionKeyVaultName = 'ingkv-${uniqueString(resourceGroup().id)}'
 var workflowKeyVaultName = 'wf-${uniqueString(resourceGroup().id)}'
 var workflowServiceAccessKeyName = 'WorkflowServiceAccessKey'
+var keyVaultSecretsUserRole = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 
 @description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
 resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
@@ -216,20 +217,20 @@ resource deliveryKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       defaultAction: 'Allow'
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: deliveryPrincipalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    enableRbacAuthorization: true
+    accessPolicies: []
   }
   dependsOn: []
+}
+
+resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: deliveryKeyVault
+  name: guid(resourceGroup().id, deliveryKeyVaultName, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: deliveryPrincipalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource deliveryKeyVaultCosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
@@ -290,20 +291,20 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       defaultAction: 'Allow'
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: packagePrincipalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    enableRbacAuthorization: true
+    accessPolicies: []
   }
   dependsOn: []
+}
+
+resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: packageKeyVault
+  name: guid(resourceGroup().id, packageKeyVault.name, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: packagePrincipalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource packageKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
@@ -332,20 +333,20 @@ resource ingestionKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       defaultAction: 'Allow'
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: ingestionPrincipalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    enableRbacAuthorization: true
+    accessPolicies: []
   }
   dependsOn: []
+}
+
+resource ingestionPrincipalVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: ingestionKeyVault
+  name: guid(resourceGroup().id, ingestionKeyVault.name, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: ingestionPrincipalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource ingestionKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
@@ -382,20 +383,20 @@ resource droneSchedulerKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       defaultAction: 'Allow'
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: droneSchedulerPrincipalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    enableRbacAuthorization: true
+    accessPolicies: []
   }
   dependsOn: []
+}
+
+resource droneSchedulerPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: droneSchedulerKeyVault
+  name: guid(resourceGroup().id, droneSchedulerKeyVault.name, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: droneSchedulerPrincipalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource droneSchedulerKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
@@ -488,20 +489,20 @@ resource workflowKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       defaultAction: 'Allow'
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: workflowPrincipalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    enableRbacAuthorization: true
+    accessPolicies: []
   }
   dependsOn: []
+}
+
+resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: workflowKeyVault
+  name: guid(resourceGroup().id, workflowKeyVault.name, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: workflowPrincipalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource workflowKeyVaultNameQueue 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
