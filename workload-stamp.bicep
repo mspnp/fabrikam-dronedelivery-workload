@@ -225,7 +225,7 @@ resource deliveryKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: deliveryKeyVault
-  name: guid(resourceGroup().id, deliveryKeyVaultName, keyVaultSecretsUserRole)
+  name: guid(resourceGroup().id, deliveryKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: deliveryPrincipalId
