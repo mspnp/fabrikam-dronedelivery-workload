@@ -225,7 +225,7 @@ resource deliveryKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: deliveryKeyVault
-  name: guid(resourceGroup().id, deliveryKeyVault.name, keyVaultSecretsUserRole)
+  name: guid(deliveryPrincipalId, deliveryKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: deliveryPrincipalId
@@ -299,7 +299,7 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: packageKeyVault
-  name: guid(resourceGroup().id, packageKeyVault.name, keyVaultSecretsUserRole)
+  name: guid(packagePrincipalId, packageKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: packagePrincipalId
@@ -341,7 +341,7 @@ resource ingestionKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource ingestionPrincipalVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: ingestionKeyVault
-  name: guid(resourceGroup().id, ingestionKeyVault.name, keyVaultSecretsUserRole)
+  name: guid(ingestionPrincipalId, ingestionKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: ingestionPrincipalId
@@ -391,7 +391,7 @@ resource droneSchedulerKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource droneSchedulerPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: droneSchedulerKeyVault
-  name: guid(resourceGroup().id, droneSchedulerKeyVault.name, keyVaultSecretsUserRole)
+  name: guid(droneSchedulerPrincipalId, droneSchedulerKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: droneSchedulerPrincipalId
@@ -497,7 +497,7 @@ resource workflowKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: workflowKeyVault
-  name: guid(resourceGroup().id, workflowKeyVault.name, keyVaultSecretsUserRole)
+  name: guid(workflowPrincipalId, workflowKeyVault.name, keyVaultSecretsUserRole)
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: workflowPrincipalId
