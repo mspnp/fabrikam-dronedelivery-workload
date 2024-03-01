@@ -1,9 +1,9 @@
 @description('Azure Container Registry resource group location.')
-param resourceGroupLocation string
+param location string = resourceGroup().location
 
 resource workflowManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-workflow'
-  location: resourceGroupLocation
+  location: location
   tags: {
     displayName: 'workflow managed identity'
     what: 'rbac'
@@ -14,7 +14,7 @@ resource workflowManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentiti
 
 resource deliveryManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-delivery'
-  location: resourceGroupLocation
+  location: location
   tags: {
     displayName: 'delivery managed identity'
     what: 'rbac'
@@ -25,7 +25,7 @@ resource deliveryManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentiti
 
 resource droneschedulerManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-dronescheduler'
-  location: resourceGroupLocation
+  location: location
   tags: {
     displayName: 'dronescheduler managed identity'
     what: 'rbac'
@@ -36,7 +36,7 @@ resource droneschedulerManagedIdentity 'Microsoft.ManagedIdentity/userAssignedId
 
 resource ingestionManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-ingestion'
-  location: resourceGroupLocation
+  location: location
   tags: {
     displayName: 'ingestion managed identity'
     what: 'rbac'
@@ -47,7 +47,7 @@ resource ingestionManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentit
 
 resource packageManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'uid-package'
-  location: resourceGroupLocation
+  location: location
   tags: {
     displayName: 'package managed identity'
     what: 'rbac'
