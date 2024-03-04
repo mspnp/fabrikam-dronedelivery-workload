@@ -64,7 +64,7 @@ resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' 
 
 module containerRegistry './nested_workload-stamp.bicep' = {
   name: nestedACRDeploymentName
-  scope: resourceGroup('rg-shipping-dronedelivery-acr')
+  scope: resourceGroup('rg-shipping-dronedelivery-${location}-acr')
   params: {
     location: location
     acrName: acrName

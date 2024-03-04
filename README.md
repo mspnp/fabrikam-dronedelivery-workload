@@ -20,6 +20,12 @@ The Drone Delivery application is a sample application that consists of several 
 
 ## Deploy an Azure Container Registry (ACR)
 
+Set environment variables.
+
+```bash
+export LOCATION=eastus
+```
+
 ### Log in to Azure CLI
 
 ```bash
@@ -29,25 +35,25 @@ az login
 ### Deploy the workload's prerequisites
 
 ```bash
-az deployment sub create --name workload-stamp-prereqs --location eastus --template-file ./workload-stamp-prereqs.bicep
+az deployment sub create --name workload-stamp-prereqs --location ${LOCATION} --template-file ./workload-stamp-prereqs.bicep
 ```
 
-:book: This pre-flight ARM template is creating a general purpose resource group  as well as one dedicated for the Azure Container Registry. Additionally five User Identites are provisioned as part of this too that will be later associated to every containerized microservice. This is because they will need Azure RBAC roles over the Azure KeyVault to read secrets in runtime.
+:book: This pre-flight Bicep template is creating a general purpose resource group  as well as one dedicated for the Azure Container Registry. Additionally five User Identites are provisioned as part of this too that will be later associated to every containerized microservice. This is because they will need Azure RBAC roles over the Azure KeyVault to read secrets in runtime. The resources will be created on the resouce group location and each resource group will contain the region as part of their names
 
 ### Get the workload user assigned identities
 
 ```bash
-DELIVERY_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-delivery --query principalId -o tsv) && \
-DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-dronescheduler --query principalId -o tsv) && \
-WORKFLOW_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-workflow --query principalId -o tsv) && \
-PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-package --query principalId -o tsv) && \
-INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery -n uid-ingestion --query principalId -o tsv)
+DELIVERY_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery-${LOCATION} -n uid-delivery --query principalId -o tsv) && \
+DRONESCHEDULER_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery-${LOCATION} -n uid-dronescheduler --query principalId -o tsv) && \
+WORKFLOW_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery-${LOCATION} -n uid-workflow --query principalId -o tsv) && \
+PACKAGE_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery-${LOCATION} -n uid-package --query principalId -o tsv) && \
+INGESTION_ID_PRINCIPAL_ID=$(az identity show -g rg-shipping-dronedelivery-${LOCATION} -n uid-ingestion --query principalId -o tsv)
 ```
 
 ### Deploy the workload
 
 ```bash
-az deployment group create -f ./workload-stamp.bicep -g rg-shipping-dronedelivery -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
+az deployment group create -f ./workload-stamp.bicep -g rg-shipping-dronedelivery-${LOCATION} -p droneSchedulerPrincipalId=$DRONESCHEDULER_PRINCIPAL_ID \
 -p workflowPrincipalId=$WORKFLOW_PRINCIPAL_ID \
 -p deliveryPrincipalId=$DELIVERY_PRINCIPAL_ID \
 -p ingestionPrincipalId=$INGESTION_ID_PRINCIPAL_ID \
@@ -57,7 +63,7 @@ az deployment group create -f ./workload-stamp.bicep -g rg-shipping-dronedeliver
 ### Assign ACR variables
 
 ```bash
-ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery -n workload-stamp --query properties.outputs.acrName.value -o tsv)
+ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery-${LOCATION} -n workload-stamp --query properties.outputs.acrName.value -o tsv)
 ACR_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
 ```
 
