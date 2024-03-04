@@ -20,8 +20,6 @@ The Drone Delivery application is a sample application that consists of several 
 
 ## Deploy an Azure Container Registry (ACR)
 
-## Azure Resources Provisioning
-
 Set environment variables.
 
 ```bash
