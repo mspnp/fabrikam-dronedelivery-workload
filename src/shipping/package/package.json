@@ -48,7 +48,7 @@
     "esm": "^3.2.25",
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",
-    "gulp-mocha": "^8.0.0",
+    "gulp-mocha": "^10.0.0",
     "gulp-nodemon": "^2.5.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "jest": "^29.5.0",
