@@ -145,22 +145,6 @@ resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
   }
   
   // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueName 'secrets' = {
-    name: 'QueueName'
-    properties: {
-      value: sbnIngestion::ingestionQueue.name
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueEndpoint 'secrets' = {
-    name: 'QueueEndpoint'
-    properties: {
-      value: sbnIngestion.properties.serviceBusEndpoint
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
   resource secretQueueAccessPolicy 'secrets' = {
     name: 'QueueAccessPolicyName'
     properties: {
@@ -508,67 +492,11 @@ resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
       value: reference(appInsights.id, '2015-05-01').InstrumentationKey
     }
   }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBEndpoint 'secrets' = {
-    name: 'CosmosDBEndpoint'
-    properties: {
-      value: cosmosDbDroneScheduler.properties.documentEndpoint
-    }
-  }
-  
+    
   resource secretCosmosDBKey 'secrets' = {
     name: 'CosmosDBKey'
     properties: {
       value: cosmosDbDroneScheduler.listKeys().primaryMasterKey
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBConnectionMode 'secrets' = {
-    name: 'CosmosDBConnectionMode'
-    properties: {
-      value: 'Gateway'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBConnectionProtocol 'secrets' = {
-    name: 'CosmosDBConnectionProtocol'
-    properties: {
-      value: 'Https'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxConnectionsLimit 'secrets' = {
-    name: 'CosmosDBMaxConnectionsLimit'
-    properties: {
-      value: '50'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxParallelism 'secrets' = {
-    name: 'CosmosDBMaxParallelism'
-    properties: {
-      value: '-1'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxBufferedItemCount 'secrets' = {
-    name: 'CosmosDBMaxBufferedItemCount'
-    properties: {
-      value: '0'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretFeatureManagementUsePartitionKey 'secrets' = {
-    name: 'FeatureManagement--UsePartitionKey'
-    properties: {
-      value: 'false'
     }
   }
 }
