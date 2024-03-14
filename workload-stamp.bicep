@@ -144,14 +144,6 @@ resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
     accessPolicies: []
   }
   
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueAccessPolicy 'secrets' = {
-    name: 'QueueAccessPolicyName'
-    properties: {
-      value: sbnIngestion::workflowAccessKey.name
-    }
-  }
-
   resource secretQueueAccessPolicyKey 'secrets' = {
     name: 'QueueAccessPolicyKey'
     properties: {
