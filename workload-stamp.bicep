@@ -12,9 +12,9 @@ var commonUniqueString = uniqueString('fabrikam', resourceGroup().id)
 
 /*** EXISTING RESOURCES ***/
 
-@description('Built-in Role: Reader - https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader')
-resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  name: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+@description('Built-in Role: Key Vault Secret Reader - https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide')
+resource keyVaultSecretsUserRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
   scope: subscription()
 }
 
@@ -133,7 +133,7 @@ resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
-    enableRbacAuthorization: false  // TODO: Convert to RBAC
+    enableRbacAuthorization: true
     tenantId: subscription().tenantId
     networkAcls: {
       bypass: 'None'
@@ -141,45 +141,9 @@ resource kvWorkflow 'Microsoft.KeyVault/vaults@2019-09-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      // TODO: Convert to RBAC
-      {
-        tenantId: subscription().tenantId
-        objectId: miWorkflow.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
   }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueName 'secrets' = {
-    name: 'QueueName'
-    properties: {
-      value: sbnIngestion::ingestionQueue.name
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueEndpoint 'secrets' = {
-    name: 'QueueEndpoint'
-    properties: {
-      value: sbnIngestion.properties.serviceBusEndpoint
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretQueueAccessPolicy 'secrets' = {
-    name: 'QueueAccessPolicyName'
-    properties: {
-      value: sbnIngestion::workflowAccessKey.name
-    }
-  }
-
+  
   resource secretQueueAccessPolicyKey 'secrets' = {
     name: 'QueueAccessPolicyKey'
     properties: {
@@ -210,13 +174,13 @@ resource dsKvWorkflow 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview'
   }
 }
 
-@description('Gives Workflow service identity ability to see its Key Vault instance.')
-resource rsWorkflowToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(miWorkflow.id, builtInReaderRole.id, kvWorkflow.id)
+@description('Gives Workflow service identity ability to read the key vault secrets')
+resource rsWorkflowToVaultSecretsUserRole  'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: kvWorkflow
+  name: guid(miWorkflow.id, keyVaultSecretsUserRole.id, kvWorkflow.id)
   properties: {
     principalId: miWorkflow.properties.principalId
-    roleDefinitionId: builtInReaderRole.id
+    roleDefinitionId: keyVaultSecretsUserRole.id
     principalType: 'ServicePrincipal'
   }
 }
@@ -344,7 +308,7 @@ resource kvDelivery 'Microsoft.KeyVault/vaults@2023-02-01' = {
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
-    enableRbacAuthorization: false  // TODO: Convert to RBAC
+    enableRbacAuthorization: true
     tenantId: subscription().tenantId
     networkAcls: {
       bypass: 'None'
@@ -352,19 +316,7 @@ resource kvDelivery 'Microsoft.KeyVault/vaults@2023-02-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      // TODO: Convert to RBAC
-      {
-        tenantId: subscription().tenantId
-        objectId: miDelivery.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
   }
 
   resource secretCosmosDbEndpoint 'secrets' = {
@@ -418,13 +370,13 @@ resource dsKvDelivery 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview'
   }
 }
 
-@description('Gives Delivery service identity ability to see its Key Vault instance.')
-resource rsDeliveryToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(miDelivery.id, builtInReaderRole.id, kvDelivery.id)
+@description('Gives Delivery service identity ability to read the key vault secrets')
+resource rsDeliveryKeyToVaultSecretsUserRole  'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: kvDelivery
+  name: guid(miDelivery.id, keyVaultSecretsUserRole.id, kvDelivery.id)
   properties: {
     principalId: miDelivery.properties.principalId
-    roleDefinitionId: builtInReaderRole.id
+    roleDefinitionId: keyVaultSecretsUserRole.id
     principalType: 'ServicePrincipal'
   }
 }
@@ -515,7 +467,7 @@ resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
-    enableRbacAuthorization: false  // TODO: Convert to RBAC
+    enableRbacAuthorization: true
     tenantId: subscription().tenantId
     networkAcls: {
       bypass: 'None'
@@ -523,19 +475,7 @@ resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      // TODO: Convert to RBAC
-      {
-        tenantId: subscription().tenantId
-        objectId: miDroneScheduler.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
   }
 
   resource secretApplicationInsights 'secrets' = {
@@ -544,67 +484,11 @@ resource kvDroneScheduler 'Microsoft.KeyVault/vaults@2023-02-01' = {
       value: reference(appInsights.id, '2015-05-01').InstrumentationKey
     }
   }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBEndpoint 'secrets' = {
-    name: 'CosmosDBEndpoint'
-    properties: {
-      value: cosmosDbDroneScheduler.properties.documentEndpoint
-    }
-  }
-  
+    
   resource secretCosmosDBKey 'secrets' = {
     name: 'CosmosDBKey'
     properties: {
       value: cosmosDbDroneScheduler.listKeys().primaryMasterKey
-    }
-  }
-
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBConnectionMode 'secrets' = {
-    name: 'CosmosDBConnectionMode'
-    properties: {
-      value: 'Gateway'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBConnectionProtocol 'secrets' = {
-    name: 'CosmosDBConnectionProtocol'
-    properties: {
-      value: 'Https'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxConnectionsLimit 'secrets' = {
-    name: 'CosmosDBMaxConnectionsLimit'
-    properties: {
-      value: '50'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxParallelism 'secrets' = {
-    name: 'CosmosDBMaxParallelism'
-    properties: {
-      value: '-1'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretCosmosDBMaxBufferedItemCount 'secrets' = {
-    name: 'CosmosDBMaxBufferedItemCount'
-    properties: {
-      value: '0'
-    }
-  }
-  
-  // TODO: This is not a secret and shouldn't be in Key Vault
-  resource secretFeatureManagementUsePartitionKey 'secrets' = {
-    name: 'FeatureManagement--UsePartitionKey'
-    properties: {
-      value: 'false'
     }
   }
 }
@@ -624,13 +508,13 @@ resource dsKvDroneScheduler 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
   }
 }
 
-@description('Gives Scheduler service identity ability to see its Key Vault instance.')
-resource rsSchedulerToKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(miDroneScheduler.id, builtInReaderRole.id, kvDroneScheduler.id)
+@description('Gives Scheduler service identity ability to read the key vault secrets')
+resource rsSchedulerToKeyVaultSecretsUserRole  'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: kvDroneScheduler
+  name: guid(miDroneScheduler.id, keyVaultSecretsUserRole.id, kvDroneScheduler.id)
   properties: {
     principalId: miDroneScheduler.properties.principalId
-    roleDefinitionId: builtInReaderRole.id
+    roleDefinitionId: keyVaultSecretsUserRole.id
     principalType: 'ServicePrincipal'
   }
 }
@@ -732,7 +616,7 @@ resource kvIngestion 'Microsoft.KeyVault/vaults@2023-02-01' = {
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
-    enableRbacAuthorization: false  // TODO: Convert to RBAC
+    enableRbacAuthorization: true
     tenantId: subscription().tenantId
     networkAcls: {
       bypass: 'None'
@@ -740,19 +624,7 @@ resource kvIngestion 'Microsoft.KeyVault/vaults@2023-02-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      // TODO: Convert to RBAC
-      {
-        tenantId: subscription().tenantId
-        objectId: miIngestion.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
   }
 
   resource secretQueueKey 'secrets' = {
@@ -785,16 +657,17 @@ resource dsKvIngestion 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview
   }
 }
 
-@description('Gives Ingestion service identity ability to see its Key Vault instance.')
-resource rsIngestionKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(miIngestion.id, builtInReaderRole.id, kvIngestion.id)
+@description('Gives Ingestion service identity ability to read the key vault secrets')
+resource rsIngestionToKeyVaultSecretsUserRole  'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: kvIngestion
+  name: guid(miIngestion.id, keyVaultSecretsUserRole.id, kvIngestion.id)
   properties: {
     principalId: miIngestion.properties.principalId
-    roleDefinitionId: builtInReaderRole.id
+    roleDefinitionId: keyVaultSecretsUserRole.id
     principalType: 'ServicePrincipal'
   }
 }
+
 
 /*** RESOURCES (Package service) ***/
 
@@ -883,7 +756,7 @@ resource kvPackage 'Microsoft.KeyVault/vaults@2023-02-01' = {
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
-    enableRbacAuthorization: false  // TODO: Convert to RBAC
+    enableRbacAuthorization: true 
     tenantId: subscription().tenantId
     networkAcls: {
       bypass: 'None'
@@ -891,19 +764,7 @@ resource kvPackage 'Microsoft.KeyVault/vaults@2023-02-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
-    accessPolicies: [
-      // TODO: Convert to RBAC
-      {
-        tenantId: subscription().tenantId
-        objectId: miPackage.properties.principalId
-        permissions: {
-          secrets: [
-            'get'
-            'list'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
   }
 
   resource secretApplicationInsightsKey 'secrets' = {
@@ -929,13 +790,13 @@ resource dsKvPackage 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
   }
 }
 
-@description('Gives Package service identity ability to see its Key Vault instance.')
-resource rsPackageKeyVault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(miPackage.id, builtInReaderRole.id, kvPackage.id)
+@description('Gives Ingestion service identity ability to read the key vault secrets')
+resource rsPackageToKeyVaultSecretsUserRole  'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: kvPackage
+  name: guid(miPackage.id, keyVaultSecretsUserRole.id, kvPackage.id)
   properties: {
     principalId: miPackage.properties.principalId
-    roleDefinitionId: builtInReaderRole.id
+    roleDefinitionId: keyVaultSecretsUserRole.id
     principalType: 'ServicePrincipal'
   }
 }
