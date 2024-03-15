@@ -29,7 +29,7 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService.Tests
             var cosmosDbMock = new Mock<ICosmosRepository<InternalDroneUtilization>>();
 
             var featureToggleMock = new Mock<IFeatureManager>();
-            featureToggleMock.Setup(fm => fm.IsEnabled(It.IsAny<string>())).Returns(true);
+            featureToggleMock.Setup(fm => fm.IsEnabledAsync(It.IsAny<string>())).Returns(Task.FromResult(true));
 
             var repo = new InvoicingRepository(cosmosDbMock.Object, featureToggleMock.Object);
 
@@ -59,7 +59,7 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService.Tests
             var cosmosDbMock = new Mock<ICosmosRepository<InternalDroneUtilization>>();
 
             var featureToggleMock = new Mock<IFeatureManager>();
-            featureToggleMock.Setup(fm => fm.IsEnabled(It.IsAny<string>())).Returns(false);
+            featureToggleMock.Setup(fm => fm.IsEnabledAsync(It.IsAny<string>())).Returns(Task.FromResult(false));
 
             var repo = new InvoicingRepository(cosmosDbMock.Object, featureToggleMock.Object);
 
@@ -104,7 +104,7 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService.Tests
                     .ReturnsAsync(invoicingData.AsEnumerable());
 
             var featureToggleMock = new Mock<IFeatureManager>();
-            featureToggleMock.Setup(fm => fm.IsEnabled(It.IsAny<string>())).Returns(true);
+            featureToggleMock.Setup(fm => fm.IsEnabledAsync(It.IsAny<string>())).Returns(Task.FromResult(true));
 
             var repo = new InvoicingRepository(cosmosDbMock.Object, featureToggleMock.Object);
 

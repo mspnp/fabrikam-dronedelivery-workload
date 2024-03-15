@@ -4,7 +4,6 @@
 // ------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
@@ -33,7 +32,7 @@ namespace Fabrikam.DroneDelivery.DroneSchedulerService.Services
                 int month)
         {
             (QueryDefinition query, string partitionKey) =
-                this._featureManager.IsEnabled(UsePartitionKeyFeatureName)
+                await _featureManager.IsEnabledAsync(UsePartitionKeyFeatureName)
                     ? (new QueryDefinition("SELECT VALUE root FROM root WHERE root.year = @year AND root.month = @month")
                             .WithParameter("@year", year)
                             .WithParameter("@month", month), 
