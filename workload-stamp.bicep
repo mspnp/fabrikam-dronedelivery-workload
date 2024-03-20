@@ -639,3 +639,6 @@ output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
 output packageKeyVaultName string = packageKeyVaultName
 output appInsightsName string = appInsightsName
+output laWorkspace string = LogAnaliticWorkpace.id
+output deliveryRedisName string = deliveryRedis.name
+output workflowServiceAccessKeyName string = ingestionSBNamespaceWorkflowServiceAccessKey.name
