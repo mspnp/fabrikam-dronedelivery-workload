@@ -220,7 +220,40 @@ resource deliveryKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableRbacAuthorization: true
     accessPolicies: []
   }
-  dependsOn: []
+  resource secretCosmosDbEndpoint 'secrets' = {
+    name: 'CosmosDB-Endpoint'
+    properties: {
+      value: deliveryCosmosDb.properties.documentEndpoint
+    }
+  }
+
+  resource secretCosmosDbKey 'secrets' = {
+    name: 'CosmosDB-Key'
+    properties: {
+      value: deliveryCosmosDb.listKeys().primaryMasterKey
+    }
+  }
+
+  resource secretRedisEndpoint 'secrets' = {
+    name: 'Redis-Endpoint'
+    properties: {
+      value: deliveryRedis.properties.hostName
+    }
+  }
+
+  resource secretRedisAccessKey 'secrets' = {
+    name: 'Redis-AccessKey'
+    properties: {
+      value: deliveryRedis.listKeys().primaryKey
+    }
+  }
+
+  resource secretApplicationInsightsKey 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: appInsights.properties.InstrumentationKey
+    }
+  }
 }
 
 resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -230,46 +263,6 @@ resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleA
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: deliveryPrincipalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-resource deliveryKeyVaultCosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: deliveryKeyVault
-  name: 'CosmosDB-Endpoint'
-  properties: {
-    value: deliveryCosmosDb.properties.documentEndpoint
-  }
-}
-
-resource deliveryKeyVaultCosmosDBKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: deliveryKeyVault
-  name: 'CosmosDB-Key'
-  properties: {
-    value: listKeys(deliveryCosmosDb.id, '2016-03-31').primaryMasterKey
-  }
-}
-
-resource deliveryKeyVaultRedisEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: deliveryKeyVault
-  name: 'Redis-Endpoint'
-  properties: {
-    value: deliveryRedis.properties.hostName
-  }
-}
-
-resource deliveryKeyVaultRedisAccessKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: deliveryKeyVault
-  name: 'Redis-AccessKey'
-  properties: {
-    value: listKeys(deliveryRedis.id, '2016-04-01').primaryKey
-  }
-}
-
-resource deliveryKeyVaultApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: deliveryKeyVault
-  name: 'ApplicationInsights--InstrumentationKey'
-  properties: {
-    value: reference(appInsights.id, '2015-05-01').InstrumentationKey
   }
 }
 
@@ -294,7 +287,12 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableRbacAuthorization: true
     accessPolicies: []
   }
-  dependsOn: []
+  resource secretApplicationInsightsKey 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: appInsights.properties.InstrumentationKey
+    }
+  }
 }
 
 resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -304,14 +302,6 @@ resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAs
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: packagePrincipalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-resource packageKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: packageKeyVault 
-  name: 'ApplicationInsights--InstrumentationKey'
-  properties: {
-    value: reference(appInsights.id, '2015-05-01').InstrumentationKey
   }
 }
 
@@ -336,7 +326,19 @@ resource ingestionKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableRbacAuthorization: true
     accessPolicies: []
   }
-  dependsOn: []
+   resource secretQueueKey 'secrets' = {
+    name: 'Queue--Key'
+    properties: {
+      value: ingestionSBNamespaceIngestionServiceAccessKey.listKeys().primaryKey
+    }
+  }
+
+  resource secretApplicationInsightsKey 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: appInsights.properties.InstrumentationKey
+    }
+  }
 }
 
 resource ingestionPrincipalVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -346,22 +348,6 @@ resource ingestionPrincipalVaultSecretsUserRole 'Microsoft.Authorization/roleAss
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: ingestionPrincipalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-resource ingestionKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: ingestionKeyVault
-  name: 'ApplicationInsights--InstrumentationKey'
-  properties: {
-    value: reference(appInsights.id, '2015-05-01').InstrumentationKey
-  }
-}
-
-resource ingestionKeyVaultNameQueueKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: ingestionKeyVault
-  name: 'Queue--Key'
-  properties: {
-    value: listKeys(ingestionSBNamespaceIngestionServiceAccessKey.id, '2017-04-01').primaryKey
   }
 }
 
@@ -386,7 +372,20 @@ resource droneSchedulerKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableRbacAuthorization: true
     accessPolicies: []
   }
-  dependsOn: []
+
+  resource secretApplicationInsights 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: reference(appInsights.id, '2015-05-01').InstrumentationKey
+    }
+  }
+    
+  resource secretCosmosDBKey 'secrets' = {
+    name: 'CosmosDBKey'
+    properties: {
+      value: droneSchedulerCosmosDb.listKeys().primaryMasterKey
+    }
+  }
 }
 
 resource droneSchedulerPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -396,78 +395,6 @@ resource droneSchedulerPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: droneSchedulerPrincipalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-resource droneSchedulerKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'ApplicationInsights--InstrumentationKey'
-  properties: {
-    value: reference(appInsights.id, '2015-05-01').InstrumentationKey
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBEndpoint 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBEndpoint'
-  properties: {
-    value: droneSchedulerCosmosDb.properties.documentEndpoint
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBKey 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBKey'
-  properties: {
-    value: listKeys(droneSchedulerCosmosDb.id, '2016-03-31').primaryMasterKey
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBConnectionMode 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBConnectionMode'
-  properties: {
-    value: 'Gateway'
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBConnectionProtocol 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBConnectionProtocol'
-  properties: {
-    value: 'Https'
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBMaxConnectionsLimit 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBMaxConnectionsLimit'
-  properties: {
-    value: '50'
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBMaxParallelism 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBMaxParallelism'
-  properties: {
-    value: '-1'
-  }
-}
-
-resource droneSchedulerKeyVaultNameCosmosDBMaxBufferedItemCount 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'CosmosDBMaxBufferedItemCount'
-  properties: {
-    value: '0'
-  }
-}
-
-resource droneSchedulerKeyVaultNameFeatureManagementUsePartitionKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: droneSchedulerKeyVault
-  name: 'FeatureManagement--UsePartitionKey'
-  properties: {
-    value: 'false'
   }
 }
 
@@ -492,7 +419,20 @@ resource workflowKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enableRbacAuthorization: true
     accessPolicies: []
   }
-  dependsOn: []
+
+  resource secretQueueAccessPolicyKey 'secrets' = {
+    name: 'QueueAccessPolicyKey'
+    properties: {
+      value: listkeys(ingestionSBNamespaceWorkflowServiceAccessKey.id, '2017-04-01').primaryKey
+    }
+  }
+
+  resource secretApplicationInsights 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: reference(appInsights.id, '2015-05-01').InstrumentationKey
+    }
+  }
 }
 
 resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -502,46 +442,6 @@ resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleA
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: workflowPrincipalId
     principalType: 'ServicePrincipal'
-  }
-}
-
-resource workflowKeyVaultNameQueue 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: workflowKeyVault
-  name: 'QueueName'
-  properties: {
-    value: ingestionSBName
-  }
-}
-
-resource workflowKeyVaultNameQueueEndpoint 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: workflowKeyVault
-  name: 'QueueEndpoint'
-  properties: {
-    value: ingestionSBNamespace.properties.serviceBusEndpoint
-  }
-}
-
-resource workflowKeyVaultNameQueueAccessPolicy 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: workflowKeyVault
-  name: 'QueueAccessPolicyName'
-  properties: {
-    value: workflowServiceAccessKeyName
-  }
-}
-
-resource workflowKeyVaultName_QueueAccessPolicyKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: workflowKeyVault
-  name: 'QueueAccessPolicyKey'
-  properties: {
-    value: listkeys(ingestionSBNamespaceWorkflowServiceAccessKey.id, '2017-04-01').primaryKey
-  }
-}
-
-resource workflowKeyVaultNameApplicationInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  parent: workflowKeyVault
-  name: 'ApplicationInsights--InstrumentationKey'
-  properties: {
-    value: reference(appInsights.id, '2015-05-01').InstrumentationKey
   }
 }
 
@@ -639,3 +539,6 @@ output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
 output packageKeyVaultName string = packageKeyVaultName
 output appInsightsName string = appInsightsName
+output laWorkspace string = LogAnaliticWorkpace.id
+output deliveryRedisName string = deliveryRedis.name
+output workflowServiceAccessKeyName string = workflowServiceAccessKeyName
