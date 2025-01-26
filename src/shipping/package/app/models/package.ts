@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-const mdb = require('mongodb')
+import mdb from 'mongodb';
 const { ObjectID } = mdb;
 
 export type PackageSize = "small" | "medium" | "large";
