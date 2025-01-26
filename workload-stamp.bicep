@@ -129,6 +129,9 @@ resource packageMongoDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     ]
     databaseAccountOfferType: 'Standard'
     isVirtualNetworkFilterEnabled: false
+    apiProperties: {
+       serverVersion: '7.0'
+    }
     virtualNetworkRules: []
   }
   dependsOn: []
