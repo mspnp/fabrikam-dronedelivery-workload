@@ -3,10 +3,10 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { MongoErrors } from './util/mongo-err'
+import { MongoErrors } from './util/mongo-err.js'
 
-let appInsights = require('applicationinsights');
-var MongoClient = require('mongodb').MongoClient;
+import appInsights from "applicationinsights";
+import { MongoClient } from "mongodb";
 
 export class PackageServiceInitializer
 {
