@@ -3,8 +3,6 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-const process = require("process")
-
 export class Settings {
   static collectionName() : string {
     return process.env["COLLECTION_NAME"]
