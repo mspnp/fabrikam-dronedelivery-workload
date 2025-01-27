@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json .
 COPY gulpfile.mjs .
 RUN npm set progress=false && npm config set depth 0
-RUN npm install --only=production
+RUN npm install --omit=dev
 RUN cp -R node_modules prod_node_modules
 
 # ---- build ----
