@@ -3,8 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import router from '@koa/router';
-const { Router } = router;
+import Router from '@koa/router';
 
 import { PackageControllers } from './controllers/package-controllers.js';
 import { HealthzControllers } from './controllers/healthz-controllers.js';
