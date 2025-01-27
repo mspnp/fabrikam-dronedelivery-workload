@@ -34,18 +34,19 @@ export class PackageServiceInitializer
     }
 
     private static initAppInsights(cloudRole = "package") {
-        if (!process.env.APPINSIGHTS_INSTRUMENTATIONKEY &&
+        if (!process.env.APPINSIGHTS_CONNECTION_STRING &&
                 process.env.NODE_ENV === 'development') {
             const logger = console;
             process.stderr.write('Skipping app insights setup - in development mode with no ikey set\n');
-            appInsights.
+            /*  appInsights.
                 defaultClient = {
                     trackEvent: logger.log.bind(console, 'trackEvent'),
                     trackException: logger.error.bind(console, 'trackException'),
                     trackMetric: logger.log.bind(console, 'trackMetric'),
                 };
-        } else if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-            appInsights.setup();
+            */
+        } else if (process.env.APPINSIGHTS_CONNECTION_STRING) {
+            appInsights.setup(process.env.APPINSIGHTS_CONNECTION_STRING!);
             appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = cloudRole;
             process.stdout.write('App insights setup - configuring client\n');
             appInsights.start();
