@@ -12,7 +12,6 @@ const options = {
 	  title: "fabrikam-drone-delivery-package-service",
 	  description: "Fabrikam Drone Delivery Package Service",
 	  version: "0.1.0",
-	  contact: "Microsoft Patterns and Practices",
 	  termsOfService: ''
 	},
     basePath: '/api',
