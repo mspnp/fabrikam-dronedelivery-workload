@@ -296,14 +296,12 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       value: appInsights.properties.InstrumentationKey
     }
   }
-  resource secretApplicationInsightsKey 'secrets' = {
+  resource secretApplicationInsightsConnectionString 'secrets' = {
     name: 'ApplicationInsights--ConnectionString'
     properties: {
       value: appInsights.properties.ConnectionString
     }
   }
-
-
 }
 
 resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
