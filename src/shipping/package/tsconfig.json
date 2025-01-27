@@ -5,7 +5,7 @@
 
   "compilerOptions": {
     "outDir": ".bin",
-    "module": "es2022",
+    "module": "Node16",
     "target": "es2022",
     "lib": ["ES2022"],
     "strict": true,
