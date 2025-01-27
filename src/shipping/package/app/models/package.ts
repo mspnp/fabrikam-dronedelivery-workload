@@ -4,7 +4,7 @@
 // ------------------------------------------------------------
 
 import mdb from 'mongodb';
-const { ObjectID } = mdb;
+const { ObjectId } = mdb;
 
 export type PackageSize = "small" | "medium" | "large";
 
@@ -15,7 +15,7 @@ export class Package {
     size: PackageSize;
 
     constructor(id? : string) {
-        this._id = id || (new ObjectID()).toHexString();
+        this._id = id || (new ObjectId()).toHexString();
         this.tag = '';
         this.weight = 0;
         this.size = 'small';
