@@ -5,15 +5,15 @@
 
 export class Settings {
   static collectionName() : string {
-    return process.env["COLLECTION_NAME"]
+    return process.env["COLLECTION_NAME"]!
   }
 
   static connectionString() : string {
-    return process.env["CONNECTION_STRING"]
+    return process.env["CONNECTION_STRING"]!
   }
 
   static containerName() : string {
-    return process.env["CONTAINER_NAME"]
+    return process.env["CONTAINER_NAME"]!
   }
 
   static logLevel() : string {
