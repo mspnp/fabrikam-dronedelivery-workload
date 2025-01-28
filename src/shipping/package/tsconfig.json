@@ -5,13 +5,13 @@
 
   "compilerOptions": {
     "outDir": ".bin",
-    "module": "Node16",
+    "module": "es2022",
     "target": "es2022",
     "lib": ["ES2022"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node16"
+    "moduleResolution": "Node"
   }
 }
