@@ -1,9 +1,9 @@
 import path from 'path';
-//import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'url';
 import swaggerJSDoc from 'swagger-jsdoc';
 
-//const __filename = fileURLToPath(import.meta.url);
-//const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const options = {
   definition: {
