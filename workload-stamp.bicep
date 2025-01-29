@@ -113,7 +113,7 @@ resource packageMongoDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
 }
 
 resource packageMongo_existing 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' existing = {
-  name: packageMongoDb.outputs.accountName
+  name: packageMongoDb.name
   scope: resourceGroup()
 }
 
