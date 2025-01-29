@@ -25,7 +25,7 @@ param location string = resourceGroup().location
   'japaneast'
   'southeastasia'
 ])
-param geoRedundancyLocation string = 'centralus'
+//param geoRedundancyLocation string = 'centralus'
 param droneSchedulerPrincipalId string
 param workflowPrincipalId string
 param deliveryPrincipalId string
@@ -68,7 +68,7 @@ module containerRegistry './nested_workload-stamp.bicep' = {
   params: {
     location: location
     acrName: acrName
-    geoRedundancyLocation: geoRedundancyLocation
+    //geoRedundancyLocation: geoRedundancyLocation
   }
   dependsOn: []
 }
