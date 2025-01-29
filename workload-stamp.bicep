@@ -39,16 +39,14 @@ resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' 
   scope: subscription()
 }
 
-resource acr 'Microsoft.ContainerRegistry/registries@2021-09-01' = {
+module containerRegistry './nested_workload-stamp.bicep' = {
+  name: nestedACRDeploymentName
   scope: resourceGroup('rg-shipping-dronedelivery-${location}-acr')
-  name: acrName
-  location: location
-  sku: {
-    name: acrSKU
+  params: {
+    location: location
+    acrName: acrName
   }
-  properties: {
-    adminUserEnabled: false
-  }
+  dependsOn: []
 }
 
 resource deliveryRedis 'Microsoft.Cache/Redis@2020-06-01' = {
