@@ -9,10 +9,9 @@ param ingestionPrincipalId string
 param packagePrincipalId string
 
 var acrName = uniqueString('acr-', subscription().subscriptionId, resourceGroup().id)
-var acrSKU = 'Standard'
 var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
 var logAnaliticWorkpaceName = 'law-${uniqueString(resourceGroup().id)}'
-//var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
+var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 var deliveryRedisCacheSKU = 'Basic'
 var deliveryRedisCacheFamily = 'C'
 var deliveryRedisCacheCapacity = 0
