@@ -522,7 +522,7 @@ resource packageKeyVaultNameMicrosoftAuthorizationPackageIdNameIdReaderRole 'Mic
   }
 }
 
-output acrId string = acr.id
+output acrId string = containerRegistry.outputs.acrId
 output acrName string = acrName
 output deliveryKeyVaultUri string = deliveryKeyVault.properties.vaultUri
 output droneSchedulerKeyVaultUri string = droneSchedulerKeyVault.properties.vaultUri
