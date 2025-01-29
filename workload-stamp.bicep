@@ -43,7 +43,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2021-09-01' = {
   name: acrName
   location: location
   sku: {
-    name: acrSku
+    name: acrSKU
   }
   properties: {
     adminUserEnabled: false
@@ -509,7 +509,7 @@ resource packageKeyVaultNameMicrosoftAuthorizationPackageIdNameIdReaderRole 'Mic
   }
 }
 
-output acrId string = containerRegistry.outputs.acrId
+output acrId string = acr.id
 output acrName string = acrName
 output deliveryKeyVaultUri string = deliveryKeyVault.properties.vaultUri
 output droneSchedulerKeyVaultUri string = droneSchedulerKeyVault.properties.vaultUri
