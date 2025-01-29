@@ -115,6 +115,66 @@ resource packageMongoDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   dependsOn: []
 }
 
+resource packageMongo_existing 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' existing = {
+  name: packageMongoDb.outputs.accountName
+  scope: resourceGroup()
+}
+
+resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+  name: packageKeyVaultName
+  location: location
+  tags: {
+    displayName: 'Package Key Vault'
+    app: 'fabrikam-package'
+  }
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: subscription().tenantId
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Allow'
+      virtualNetworkRules: []
+    }
+    enableRbacAuthorization: true
+    accessPolicies: []
+  }
+  resource secretApplicationInsightsKey 'secrets' = {
+    name: 'ApplicationInsights--InstrumentationKey'
+    properties: {
+      value: appInsights.properties.InstrumentationKey
+    }
+  }
+  resource secretApplicationInsightsConnectionString 'secrets' = {
+    name: 'ApplicationInsights--ConnectionString'
+    properties: {
+      value: appInsights.properties.ConnectionString
+    }
+  }
+  resource secretCosmosDBConnectionString 'secrets' = {
+    name: 'CosmosDb--ConnectionString'
+    properties: {
+      value: packageMongo_existing.listConnectionStrings().connectionStrings[0].connectionString
+    }
+  }
+
+  dependsOn: [packageMongoDb]
+}
+
+resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: packageKeyVault
+  name: guid(packagePrincipalId, packageKeyVault.name, keyVaultSecretsUserRole)
+  properties: {
+    roleDefinitionId: keyVaultSecretsUserRole
+    principalId: packagePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+
+
 resource droneSchedulerCosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: droneSchedulerCosmosDbName
   location: location
@@ -243,51 +303,6 @@ resource deliveryPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleA
   properties: {
     roleDefinitionId: keyVaultSecretsUserRole
     principalId: deliveryPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: packageKeyVaultName
-  location: location
-  tags: {
-    displayName: 'Package Key Vault'
-    app: 'fabrikam-package'
-  }
-  properties: {
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    tenantId: subscription().tenantId
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
-      virtualNetworkRules: []
-    }
-    enableRbacAuthorization: true
-    accessPolicies: []
-  }
-  resource secretApplicationInsightsKey 'secrets' = {
-    name: 'ApplicationInsights--InstrumentationKey'
-    properties: {
-      value: appInsights.properties.InstrumentationKey
-    }
-  }
-  resource secretApplicationInsightsConnectionString 'secrets' = {
-    name: 'ApplicationInsights--ConnectionString'
-    properties: {
-      value: appInsights.properties.ConnectionString
-    }
-  }
-}
-
-resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: packageKeyVault
-  name: guid(packagePrincipalId, packageKeyVault.name, keyVaultSecretsUserRole)
-  properties: {
-    roleDefinitionId: keyVaultSecretsUserRole
-    principalId: packagePrincipalId
     principalType: 'ServicePrincipal'
   }
 }
