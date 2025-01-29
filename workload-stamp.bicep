@@ -40,6 +40,7 @@ resource builtInReaderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' 
 }
 
 resource acr 'Microsoft.ContainerRegistry/registries@2021-09-01' = {
+  scope: resourceGroup('rg-shipping-dronedelivery-${location}-acr')
   name: acrName
   location: location
   sku: {
