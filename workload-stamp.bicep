@@ -68,7 +68,11 @@ module containerRegistry './nested_workload-stamp.bicep' = {
   params: {
     location: location
     acrName: acrName
+    sku: 'Standard' 
     //geoRedundancyLocation: geoRedundancyLocation
+  }
+  properties: {
+    adminUserEnabled: false
   }
   dependsOn: []
 }
