@@ -7,28 +7,28 @@ param workflowPrincipalId string
 param deliveryPrincipalId string
 param ingestionPrincipalId string
 param packagePrincipalId string
-
-var acrName = uniqueString('acr-', subscription().subscriptionId, resourceGroup().id)
-var appInsightsName = 'ai-${uniqueString(resourceGroup().id)}'
-var logAnaliticWorkpaceName = 'law-${uniqueString(resourceGroup().id)}'
+var prefix = substring(uniqueString(subscription().subscriptionId, resourceGroup().id), 0, 10)
+var acrName = 'acr-$prefix'
+var appInsightsName = 'ai-$prefix'
+var logAnaliticWorkpaceName = 'law-$prefix'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 var deliveryRedisCacheSKU = 'Basic'
 var deliveryRedisCacheFamily = 'C'
 var deliveryRedisCacheCapacity = 0
-var deliveryCosmosDbName = 'd-${uniqueString(resourceGroup().id)}'
-var deliveryRedisName = 'dr-${uniqueString(resourceGroup().id)}'
-var deliveryKeyVaultName = 'dkv-${uniqueString(resourceGroup().id)}'
-var droneSchedulerCosmosDbName = 'ds-${uniqueString(resourceGroup().id)}'
-var droneSchedulerKeyVaultName = 'ds-${uniqueString(resourceGroup().id)}'
-var packageKeyVaultName = 'pkkv-${uniqueString(resourceGroup().id)}'
-var packageMongoDbName = 'p-${uniqueString(resourceGroup().id)}'
-var ingestionSBNamespaceName = 'i-${uniqueString(resourceGroup().id)}'
+var deliveryCosmosDbName = 'cosmos-delivery-$prefix'
+var deliveryRedisName = 'redis-delivery-$prefix'
+var deliveryKeyVaultName = 'kv-delivery-$prefix'
+var droneSchedulerCosmosDbName = 'cosmos-scheduler-$prefix'
+var droneSchedulerKeyVaultName = 'kv-schedule-$prefix'
+var packageKeyVaultName = 'kv-package-$prefix'
+var packageMongoDbName = 'cosmon-package-$prefix'
+var ingestionSBNamespaceName = 'sbns-ingest-$prefix'
 var ingestionSBNamespaceSKU = 'Premium'
 var ingestionSBNamespaceTier = 'Premium'
-var ingestionSBName = 'i-${uniqueString(resourceGroup().id)}'
+var ingestionSBName = 'sb-ingest-$prefix'
 var ingestionServiceAccessKeyName = 'IngestionServiceAccessKey'
-var ingestionKeyVaultName = 'ingkv-${uniqueString(resourceGroup().id)}'
-var workflowKeyVaultName = 'wf-${uniqueString(resourceGroup().id)}'
+var ingestionKeyVaultName = 'kv-ingest-$prefix'
+var workflowKeyVaultName = 'kv-workflow-$prefix'
 var workflowServiceAccessKeyName = 'WorkflowServiceAccessKey'
 var keyVaultSecretsUserRole = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 
