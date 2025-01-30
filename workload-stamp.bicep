@@ -8,7 +8,7 @@ param deliveryPrincipalId string
 param ingestionPrincipalId string
 param packagePrincipalId string
 var prefix = substring(uniqueString(subscription().subscriptionId, resourceGroup().id), 0, 10)
-var acrName = 'acr${prefix}'
+var acrName = 'cr${prefix}'
 var appInsightsName = 'ai-${prefix}'
 var logAnaliticWorkpaceName = 'law-${prefix}'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
@@ -25,7 +25,7 @@ var packageMongoDbName = 'cosmon-package-${prefix}'
 var ingestionSBNamespaceName = 'sbns-ingest-${prefix}'
 var ingestionSBNamespaceSKU = 'Premium'
 var ingestionSBNamespaceTier = 'Premium'
-var ingestionSBName = 'sb-ingest-$prefix'
+var ingestionSBName = 'sb-ingest-${prefix}'
 var ingestionServiceAccessKeyName = 'IngestionServiceAccessKey'
 var ingestionKeyVaultName = 'kv-ingest-${prefix}'
 var workflowKeyVaultName = 'kv-workflow-${prefix}'
