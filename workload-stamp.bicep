@@ -26,7 +26,6 @@ param location string = resourceGroup().location
   'southeastasia'
 ])
 param geoRedundancyLocation string = 'centralus'
-param geoRedundancyLocation string = 'centralus'
 param droneSchedulerPrincipalId string
 param workflowPrincipalId string
 param deliveryPrincipalId string
