@@ -1,6 +1,7 @@
 {
   "name": "fabrikam-drone-delivery-package-service",
   "version": "0.1.0",
+  "type": "module",
   "description": "Fabrikam Drone Delivery Package Service",
   "scripts": {
     "start": "gulp serve",
@@ -24,37 +25,26 @@
   "author": "Microsoft Patterns and Practices",
   "license": "MIT",
   "dependencies": {
-    "@koa/router": "^12.0.0",
-    "applicationinsights": "^2.6.0",
+    "@koa/router": "^13.0.1",
+    "applicationinsights": "^3.4.0",
     "koa": "^2.15.4",
-    "koa-bodyparser": "^4.4.0",
+    "koa-bodyparser": "^4.4.1",
     "koa-compress": "^5.1.1",
-    "mongodb": "3.2.1",
-    "swagger-jsdoc": "^6.2.8",
-    "winston": "^3.8.2"
+    "mongodb": "^6.12.0",
+    "winston": "^3.17.0",
+    "swagger-jsdoc": "^6.2.8"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.8",
-    "@babel/preset-env": "^7.21.5",
-    "@babel/preset-typescript": "^7.21.5",
-    "@types/jest": "^29.5.1",
-    "@types/koa": "^2.13.6",
-    "@types/koa-bodyparser": "^4.3.10",
-    "@types/koa-router": "^7.4.4",
-    "@types/mocha": "^10.0.1",
-    "@types/mongodb": "^4.0.7",
-    "babel-jest": "^29.5.0",
-    "del": "^7.0.0",
-    "esm": "^3.2.25",
-    "gulp": "^4.0.2",
-    "gulp-cli": "^2.3.0",
-    "gulp-mocha": "^10.0.0",
+    "@types/koa": "^2.15.0",
+    "@types/koa__router": "^12.0.4",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-compress": "^4.0.6",
+    "@types/node": "^22.10.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "del": "^8.0.0",
+    "gulp": "^5.0.0",
+    "gulp-mocha": "^10.0.1",
     "gulp-nodemon": "^2.5.0",
-    "gulp-typescript": "^6.0.0-alpha.1",
-    "jest": "^29.5.0",
-    "koa-router": "^12.0.0",
-    "npm-check-updates": "^16.10.12",
-    "supertest": "^6.3.3",
-    "typescript": "^5.0.4"
+    "gulp-typescript": "^6.0.0-alpha.1"
   }
 }

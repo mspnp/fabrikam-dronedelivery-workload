@@ -3,11 +3,11 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { UpsertStatus } from '../models/repository'
-import * as apiModels from '../models/api-models'
-import { Package, PackageSize } from '../models/package'
-import { ILogger } from '../util/logging'
-import { MongoErrors } from '../util/mongo-err'
+import { UpsertStatus } from '../models/repository.js'
+import * as apiModels from '../models/api-models.js'
+import { Package, PackageSize } from '../models/package.js'
+import { ILogger } from '../util/logging.js'
+import { MongoErrors } from '../util/mongo-err.js'
 
 export class PackageControllers {
   /**

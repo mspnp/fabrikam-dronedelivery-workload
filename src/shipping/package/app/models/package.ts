@@ -3,8 +3,8 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-const mdb = require('mongodb')
-const { ObjectID } = mdb;
+import mdb from 'mongodb';
+const { ObjectId } = mdb;
 
 export type PackageSize = "small" | "medium" | "large";
 
@@ -15,7 +15,7 @@ export class Package {
     size: PackageSize;
 
     constructor(id? : string) {
-        this._id = id || (new ObjectID()).toHexString();
+        this._id = id || (new ObjectId()).toHexString();
         this.tag = '';
         this.weight = 0;
         this.size = 'small';
