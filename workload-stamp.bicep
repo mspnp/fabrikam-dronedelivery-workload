@@ -35,7 +35,7 @@ param packagePrincipalId string
 var prefix = substring(uniqueString(subscription().subscriptionId, resourceGroup().id), 0, 10)
 var acrName = 'acr${prefix}'
 var appInsightsName = 'ai-${prefix}'
-var logAnaliticWorkpaceName = 'law-${prefix}'
+var logAnalyticsWorkpaceName = 'law-${prefix}'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 var deliveryRedisCacheSKU = 'Basic'
 var deliveryRedisCacheFamily = 'C'
@@ -470,8 +470,8 @@ resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleA
   }
 }
 
-resource LogAnaliticWorkpace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: logAnaliticWorkpaceName
+resource logAnalyticsWorkpace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+  name: logAnalyticsWorkpaceName
   location: location
   properties: {
     sku: {
@@ -491,7 +491,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
   properties: {
     Application_Type: 'other'
-    WorkspaceResourceId: LogAnaliticWorkpace.id
+    WorkspaceResourceId: logAnalyticsWorkpace.id
     IngestionMode:'LogAnalytics'
     publicNetworkAccessForIngestion:'Enabled'
     publicNetworkAccessForQuery:'Enabled'
@@ -564,6 +564,6 @@ output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
 output packageKeyVaultName string = packageKeyVaultName
 output appInsightsName string = appInsightsName
-output laWorkspace string = LogAnaliticWorkpace.id
+output laWorkspace string = logAnalyticsWorkpace.id
 output deliveryRedisName string = deliveryRedis.name
 output workflowServiceAccessKeyName string = workflowServiceAccessKeyName
