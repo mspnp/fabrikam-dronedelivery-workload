@@ -24,7 +24,6 @@ export class PackageServiceInitializer
     private static async initMongoDb(connection: string, collectionName: string) {
         try {
             var db = (await MongoClient.connect(connection)).db();
-            //await db.command({ shardCollection: db.databaseName + '.' + collectionName, key: { tag: "hashed" } });
             await db.command({customAction: "CreateCollection", collection: db.databaseName + '.' + collectionName});
         }
         catch (ex: any) {
