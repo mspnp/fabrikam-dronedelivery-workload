@@ -37,14 +37,7 @@ export class PackageServiceInitializer
         if (!process.env.APPINSIGHTS_CONNECTION_STRING &&
                 process.env.NODE_ENV === 'development') {
             const logger = console;
-            process.stderr.write('Skipping app insights setup - in development mode with no ikey set\n');
-            /*  appInsights.
-                defaultClient = {
-                    trackEvent: logger.log.bind(console, 'trackEvent'),
-                    trackException: logger.error.bind(console, 'trackException'),
-                    trackMetric: logger.log.bind(console, 'trackMetric'),
-                };
-            */
+            process.stderr.write('Skipping app insights setup - in development mode with no application insights connection string set\n');
         } else if (process.env.APPINSIGHTS_CONNECTION_STRING) {
             appInsights.setup(process.env.APPINSIGHTS_CONNECTION_STRING!);
             appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = cloudRole;
@@ -56,4 +49,3 @@ export class PackageServiceInitializer
         }
     }
 }
-
