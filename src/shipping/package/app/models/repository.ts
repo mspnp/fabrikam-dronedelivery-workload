@@ -9,8 +9,6 @@ import { Settings } from '../util/settings.js';
 import * as Logger from '../util/logging.js';
 import { MongoErrors } from '../util/mongo-err.js';
 
-//var MongoClient = require('mongodb').MongoClient;
-
 import { MongoClient } from "mongodb";
 
 export enum UpsertStatus {
@@ -22,7 +20,6 @@ export class Repository
 {
   static readonly collectionName = Settings.collectionName();
   private static db:any;
-
 
   static async initialize(connection: string) {
       Repository.db = (await MongoClient.connect(connection)).db();
@@ -75,6 +72,5 @@ export class Repository
     pkg.tag = apiPkg.tag;
     return pkg;
   }
-
 }
 
