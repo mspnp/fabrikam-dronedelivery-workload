@@ -138,11 +138,6 @@ resource packageMongoDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   dependsOn: []
 }
 
-resource packageMongo_existing 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' existing = {
-  name: packageMongoDb.name
-  scope: resourceGroup()
-}
-
 resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: packageKeyVaultName
   location: location
@@ -179,7 +174,7 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   resource secretCosmosDBConnectionString 'secrets' = {
     name: 'CosmosDb--ConnectionString'
     properties: {
-      value: packageMongo_existing.listConnectionStrings().connectionStrings[0].connectionString
+      value: packageMongoDb.listConnectionStrings().connectionStrings[0].connectionString
     }
   }
 
