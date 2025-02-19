@@ -191,8 +191,6 @@ resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAs
   }
 }
 
-
-
 resource droneSchedulerCosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: droneSchedulerCosmosDbName
   location: location
