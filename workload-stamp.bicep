@@ -35,7 +35,7 @@ param packagePrincipalId string
 var prefix = substring(uniqueString(subscription().subscriptionId, resourceGroup().id), 0, 10)
 var acrName = 'acr${prefix}'
 var appInsightsName = 'ai-${prefix}'
-var logAnalyticsWorkpaceName = 'law-${prefix}'
+var logAnalyticsWorkspaceName = 'law-${prefix}'
 var nestedACRDeploymentName = '${resourceGroup().name}-acr-deployment'
 var deliveryRedisCacheSKU = 'Basic'
 var deliveryRedisCacheFamily = 'C'
@@ -462,8 +462,8 @@ resource workflowPrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleA
   }
 }
 
-resource logAnalyticsWorkpace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
-  name: logAnalyticsWorkpaceName
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+  name: logAnalyticsWorkspaceName
   location: location
   properties: {
     sku: {
