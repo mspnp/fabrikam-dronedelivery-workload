@@ -1,4 +1,4 @@
-FROM node:alpine3.20 AS base
+FROM node:23.1-alpine AS base
 
 WORKDIR /app
 
@@ -24,8 +24,6 @@ RUN  npm run build
 
 # ---- runtime ----
 FROM base AS runtime
-
-LABEL MAINTAINER="Fernando Antivero (https://github.com/ferantivero)"
 
 WORKDIR /app
 COPY --from=dependencies /app/prod_node_modules ./node_modules
