@@ -178,7 +178,6 @@ resource packageKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     }
   }
 
-  dependsOn: [packageMongoDb]
 }
 
 resource packagePrincipalKeyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
