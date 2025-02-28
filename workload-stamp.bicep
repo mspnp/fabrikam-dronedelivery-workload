@@ -483,7 +483,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
   properties: {
     Application_Type: 'other'
-    WorkspaceResourceId: logAnalyticsWorkpace.id
+    WorkspaceResourceId: logAnalyticsWorkspace.id
     IngestionMode:'LogAnalytics'
     publicNetworkAccessForIngestion:'Enabled'
     publicNetworkAccessForQuery:'Enabled'
@@ -556,6 +556,6 @@ output droneSchedulerKeyVaultName string = droneSchedulerKeyVaultName
 output ingestionKeyVaultName string = ingestionKeyVaultName
 output packageKeyVaultName string = packageKeyVaultName
 output appInsightsName string = appInsightsName
-output laWorkspace string = logAnalyticsWorkpace.id
+output laWorkspace string = logAnalyticsWorkspace.id
 output deliveryRedisName string = deliveryRedis.name
 output workflowServiceAccessKeyName string = workflowServiceAccessKeyName
