@@ -1,8 +1,8 @@
-FROM openjdk:8-jre-alpine as base
+FROM openjdk:17.0.1-jdk-slim as base
 WORKDIR /usr/src/app
 EXPOSE 80
 
-FROM maven:3.6.0-jdk-8-slim as maven
+FROM maven:3.6.3-openjdk-17-slim as maven
 WORKDIR /usr/src/app
 
 COPY pom.xml ./
@@ -28,9 +28,9 @@ FROM base as final
 
 WORKDIR /app
 
-ADD https://github.com/Microsoft/ApplicationInsights-Java/releases/download/2.3.0/applicationinsights-agent-2.3.0.jar ./appinsights/applicationinsights-agent-2.3.0.jar
+ADD https://github.com/Microsoft/ApplicationInsights-Java/releases/download/3.6.2/applicationinsights-agent-3.6.2.jar ./appinsights/applicationinsights-agent-3.6.2.jar
 ADD /etc/AI-Agent.xml ./appinsights/AI-Agent.xml
 
 COPY --from=package /usr/src/app/target/ingestion-0.1.0.jar ./
 
-ENTRYPOINT ["java","-Djava.security.egdfile=file:/dev/./urandom","-javaagent:/app/appinsights/applicationinsights-agent-2.3.0.jar","-jar","ingestion-0.1.0.jar"]
+ENTRYPOINT ["java","-Djava.security.egdfile=file:/dev/./urandom","-javaagent:/app/appinsights/applicationinsights-agent-3.6.2.jar","-jar","ingestion-0.1.0.jar"]
