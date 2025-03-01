@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { ILogger } from '../util/logging'
+import { ILogger } from '../util/logging.js'
 
 export class HealthzControllers {
 

@@ -60,7 +60,7 @@ az deployment group create -f ./workload-stamp.bicep -g rg-shipping-dronedeliver
 -p packagePrincipalId=$PACKAGE_ID_PRINCIPAL_ID
 ```
 
-### Assign ACR variables
+### Assign Azure Container Registry variables
 
 ```bash
 ACR_NAME=$(az deployment group show -g rg-shipping-dronedelivery-${LOCATION} -n workload-stamp --query properties.outputs.acrName.value -o tsv)

@@ -3,6 +3,6 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-export * from './package-controllers';
-export * from './healthz-controllers';
-export * from './swagger-controllers';
+export * from './package-controllers.js';
+export * from './healthz-controllers.js';
+export * from './swagger-controllers.js';
