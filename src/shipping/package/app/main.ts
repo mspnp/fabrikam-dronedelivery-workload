@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { PackageServiceInitializer } from './initializer'
-import { PackageService } from './server';
-import { Settings } from './util/settings';
+import { PackageServiceInitializer } from './initializer.js'
+import { PackageService } from './server.js';
+import { Settings } from './util/settings.js';
 
 PackageServiceInitializer.initialize(Settings.connectionString(), Settings.collectionName(), Settings.containerName())
     .then(_ => {

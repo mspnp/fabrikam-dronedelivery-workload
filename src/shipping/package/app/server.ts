@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { KoaApp } from './app';
-import { Repository } from './models/repository';
-import { Settings } from './util/settings';
+import { KoaApp } from './app.js';
+import { Repository } from './models/repository.js';
+import { Settings } from './util/settings.js';
 
 export class PackageService {
 

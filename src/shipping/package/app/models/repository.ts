@@ -3,13 +3,13 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { Package, PackageSize } from './package'
-import * as apiModels from './api-models'
-import { Settings } from '../util/settings';
-import * as Logger from '../util/logging';
-import { MongoErrors } from '../util/mongo-err';
+import { Package, PackageSize } from './package.js'
+import * as apiModels from './api-models.js'
+import { Settings } from '../util/settings.js';
+import * as Logger from '../util/logging.js';
+import { MongoErrors } from '../util/mongo-err.js';
 
-var MongoClient = require('mongodb').MongoClient;
+import { MongoClient } from "mongodb";
 
 export enum UpsertStatus {
     Created = 1,
@@ -20,7 +20,6 @@ export class Repository
 {
   static readonly collectionName = Settings.collectionName();
   private static db:any;
-
 
   static async initialize(connection: string) {
       Repository.db = (await MongoClient.connect(connection)).db();
@@ -73,6 +72,5 @@ export class Repository
     pkg.tag = apiPkg.tag;
     return pkg;
   }
-
 }
 

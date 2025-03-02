@@ -3,10 +3,10 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
-import { MongoErrors } from './util/mongo-err'
+import { MongoErrors } from './util/mongo-err.js'
 
-let appInsights = require('applicationinsights');
-var MongoClient = require('mongodb').MongoClient;
+import appInsights from "applicationinsights";
+import { MongoClient } from "mongodb";
 
 export class PackageServiceInitializer
 {
@@ -23,29 +23,26 @@ export class PackageServiceInitializer
 
     private static async initMongoDb(connection: string, collectionName: string) {
         try {
-            var db = (await MongoClient.connect(connection)).db();
-            await db.command({ shardCollection: db.databaseName + '.' + collectionName, key: { tag: "hashed" } });
-        }
+              var db = (await MongoClient.connect(connection)).db();
+              await db.command({
+                shardCollection: db.databaseName + "." + collectionName,
+                key: { tag: "hashed" },
+              });
+        } 
         catch (ex: any) {
-            if (ex.code != MongoErrors.CommandNotFound && ex.code != 9) {
+              if (ex.code != MongoErrors.CommandNotFound && ex.code != 9) {
                 console.log(ex);
-            }
+              }
         }
     }
 
     private static initAppInsights(cloudRole = "package") {
-        if (!process.env.APPINSIGHTS_INSTRUMENTATIONKEY &&
+        if (!process.env.APPINSIGHTS_CONNECTION_STRING &&
                 process.env.NODE_ENV === 'development') {
             const logger = console;
-            process.stderr.write('Skipping app insights setup - in development mode with no ikey set\n');
-            appInsights.
-                defaultClient = {
-                    trackEvent: logger.log.bind(console, 'trackEvent'),
-                    trackException: logger.error.bind(console, 'trackException'),
-                    trackMetric: logger.log.bind(console, 'trackMetric'),
-                };
-        } else if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-            appInsights.setup();
+            process.stderr.write('Skipping app insights setup - in development mode with no application insights connection string set\n');
+        } else if (process.env.APPINSIGHTS_CONNECTION_STRING) {
+            appInsights.setup(process.env.APPINSIGHTS_CONNECTION_STRING!);
             appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = cloudRole;
             process.stdout.write('App insights setup - configuring client\n');
             appInsights.start();
@@ -55,4 +52,3 @@ export class PackageServiceInitializer
         }
     }
 }
-
