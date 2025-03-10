@@ -110,7 +110,7 @@ public class IngestionIT {
 	
 	@Test
 	public void ProbeDeliveryITIsOk() throws Exception {
-		MvcResult resultActions = mockMvc.perform(get("/api/probe/").contentType(MediaType.APPLICATION_JSON))
+		MvcResult resultActions = mockMvc.perform(get("/api/probe").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(request().asyncStarted()).andReturn();
 
 		mockMvc.perform(asyncDispatch(resultActions)).andExpect(status().is2xxSuccessful());

@@ -8,7 +8,7 @@ import com.fabrikam.dronedelivery.ingestion.service.*;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
