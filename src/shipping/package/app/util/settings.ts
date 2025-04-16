@@ -19,4 +19,8 @@ export class Settings {
   static logLevel() : string {
     return process.env["LOG_LEVEL"] || 'debug'
   }
+
+  static appInsigthsConnectionString() : string {
+    return process.env["APPINSIGHTS_CONNECTION_STRING"]!
+  }
 }
