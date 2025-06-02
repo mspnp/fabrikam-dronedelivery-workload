@@ -10,8 +10,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
-		<PackageReference Include="Azure.Identity" Version="1.13.2" />
-		<PackageReference Include="Azure.Messaging.EventHubs" Version="5.11.6" />
+		<PackageReference Include="Azure.Identity" Version="1.14.0" />
+		<PackageReference Include="Azure.Messaging.EventHubs" Version="5.12.1" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.23.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.Kubernetes" Version="7.0.2" />
@@ -20,8 +20,8 @@
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-		<PackageReference Include="StackExchange.Redis" Version="2.8.31" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+		<PackageReference Include="StackExchange.Redis" Version="2.8.37" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Fabrikam.DroneDelivery.Common\Fabrikam.DroneDelivery.Common.csproj" />
