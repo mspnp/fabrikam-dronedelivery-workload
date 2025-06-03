@@ -16,7 +16,6 @@ import com.microsoft.applicationinsights.telemetry.Duration;
 import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
 import com.microsoft.applicationinsights.web.internal.ThreadContext;
-import com.microsoft.applicationinsights.web.internal.correlation.TelemetryCorrelationUtils;
 import com.microsoft.azure.servicebus.IMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +107,7 @@ public class ServiceBusTracingImpl implements ServiceBusTracing {
 		String target,
 		Duration duration,
 		boolean successful) {
-		String dependencyId = TelemetryCorrelationUtils
-								.generateChildDependencyId();
+	
 
 		RemoteDependencyTelemetry dependencyTelemetry =
 			new RemoteDependencyTelemetry(
@@ -118,7 +116,6 @@ public class ServiceBusTracingImpl implements ServiceBusTracing {
 				duration,
 				successful);
 
-		dependencyTelemetry.setId(dependencyId);
 		dependencyTelemetry.setType(SERVICE_BUS_REMOTE_DEPENDENCY_TYPE);
 		dependencyTelemetry.setTarget(target);
 
