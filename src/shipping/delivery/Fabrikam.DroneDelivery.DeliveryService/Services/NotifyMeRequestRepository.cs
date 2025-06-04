@@ -14,12 +14,12 @@ namespace Fabrikam.DroneDelivery.DeliveryService.Services
     {
         public async Task<IEnumerable<InternalNotifyMeRequest>> GetAllByDeliveryIdAsync(string deliveryId)
         {
-            return await DocumentDBRepository<InternalNotifyMeRequest>.GetItemsAsync(n => n.DeliveryId == deliveryId, deliveryId.Substring(0, Constants.PartitionKeyLength));
+            return await CosmosDBRepository<InternalNotifyMeRequest>.GetItemsAsync(n => n.DeliveryId == deliveryId, deliveryId.Substring(0, Constants.PartitionKeyLength));
         }
 
         public async Task AddAsync(InternalNotifyMeRequest notifyMeRequest)
         {
-            await DocumentDBRepository<InternalNotifyMeRequest>.CreateItemAsync(notifyMeRequest, notifyMeRequest.DeliveryId.Substring(0, Constants.PartitionKeyLength));
+            await CosmosDBRepository<InternalNotifyMeRequest>.CreateItemAsync(notifyMeRequest, notifyMeRequest.DeliveryId.Substring(0, Constants.PartitionKeyLength));
         }
     }
 }
