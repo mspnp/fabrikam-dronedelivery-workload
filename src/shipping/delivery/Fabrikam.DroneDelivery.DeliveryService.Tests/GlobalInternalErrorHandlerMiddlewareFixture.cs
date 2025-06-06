@@ -11,12 +11,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Azure.Documents;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Fabrikam.DroneDelivery.DeliveryService.Middlewares;
-using Fabrikam.DroneDelivery.DeliveryService.Tests.Common;
+using Microsoft.Azure.Cosmos;
 
 
 namespace Fabrikam.DroneDelivery.DeliveryService.Tests
@@ -127,12 +126,7 @@ namespace Fabrikam.DroneDelivery.DeliveryService.Tests
                 return Task.CompletedTask;
             }
             else
-                return Task.FromException(new Error
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Code = "429",
-                    Message = "Request rate is large"
-                }.CreateDocumentClientExceptionForTesting((HttpStatusCode)429));
+                return Task.FromException(new CosmosException("Request rate is large", (HttpStatusCode)429, 0, Guid.NewGuid().ToString(), 0.0));
         }
 
         Task Next(HttpContext context)
