@@ -2,9 +2,7 @@
 
 This repository contains source files and build instructions for the containerized Fabrikam Drone Delivery application. Once all the microservices are built and pushed to your Azure Container Registry, they're ready to be pulled by any Azure service that has support for containers.
 
-It is currently used in:
-* [Microservices architecture on AKS](https://github.com/mspnp/microservices-reference-implementation)
-* [Fabrikam drone delivery](https://github.com/mspnp/aks-fabrikam-dronedelivery) reference implementation.
+It is used in the [Fabrikam drone delivery](https://github.com/mspnp/aks-fabrikam-dronedelivery) reference implementation.
 
 ## The Drone Delivery app
 
