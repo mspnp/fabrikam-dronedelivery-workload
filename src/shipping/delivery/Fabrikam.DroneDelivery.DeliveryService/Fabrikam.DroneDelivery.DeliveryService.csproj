@@ -22,7 +22,7 @@
 		<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
 		<PackageReference Include="StackExchange.Redis" Version="2.9.11" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Fabrikam.DroneDelivery.Common\Fabrikam.DroneDelivery.Common.csproj" />
