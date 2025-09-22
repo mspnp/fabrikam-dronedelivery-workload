@@ -28,6 +28,7 @@
 		<ProjectReference Include="..\Fabrikam.DroneDelivery.Common\Fabrikam.DroneDelivery.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+  	<PackageReference Include="KubernetesClient" Version="17.0.14" />
 		<WCFMetadata Include="Connected Services" />
 	</ItemGroup>
 
